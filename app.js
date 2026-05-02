@@ -320,6 +320,35 @@ function storySlug(story) {
   return story.id;
 }
 
+function absoluteUrl(hash = "") {
+  const localHost = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+  const base = window.location.protocol === "file:" || localHost ? "https://bafsl.com/" : `${window.location.origin}${window.location.pathname}`;
+  return `${base}${hash}`;
+}
+
+function escapeAttr(value) {
+  return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function matchShareHash(match) {
+  return `#match/${encodeURIComponent(match.id)}`;
+}
+
+function matchShareText(match) {
+  const home = teamById(match.home);
+  const away = teamById(match.away);
+  const score = match.homeScore === null || match.awayScore === null ? "vs" : `${match.homeScore} - ${match.awayScore}`;
+  const dateTime = `${formatDate(match)}${match.time ? `, ${formatTime(match)}` : ""}`;
+  const venue = match.venue ? ` at ${match.venue}` : "";
+  return `${home.name} ${score} ${away.name} | ${dateTime}${venue} | BAFSL`;
+}
+
+function facebookShareUrl(match) {
+  const hash = matchShareHash(match);
+  const url = absoluteUrl(hash);
+  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(matchShareText(match))}`;
+}
+
 function teamLink(team, className = "") {
   return `<a class="${className}" href="#team/${team.id}">${team.name}</a>`;
 }
@@ -367,7 +396,7 @@ function renderEventName(event) {
   return `<span class="event-names"><span class="event-player">${player}</span>${assist}</span>`;
 }
 
-function renderMatchEvents(match) {
+function renderMatchEvents(match, open = false) {
   const events = match.events || [];
   if (!events.length) return "";
 
@@ -397,7 +426,7 @@ function renderMatchEvents(match) {
     `;
   }).join("");
 
-  return `<div class="match-events" id="events-${match.id}" hidden>${rows}</div>`;
+  return `<div class="match-events" id="events-${match.id}" ${open ? "" : "hidden"}>${rows}</div>`;
 }
 
 function renderLeagueCenter() {
@@ -454,6 +483,7 @@ function renderMatches() {
       : `<span>${score}</span>`;
     return `
       <article class="match-card">
+        <a class="facebook-share-button" href="${escapeAttr(facebookShareUrl(match))}" target="_blank" rel="noopener" aria-label="Share ${escapeAttr(matchShareText(match))} on Facebook" title="Share on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></a>
         <div class="match-meta">
           <strong>${formatDate(match)}</strong><br />
           ${match.time ? `${formatTime(match)}<br />` : ""}
@@ -761,6 +791,44 @@ function renderTeamPage(teamId) {
   `;
 }
 
+function renderMatchPage(matchId) {
+  const match = state.matches.find((item) => item.id === decodeURIComponent(matchId));
+  if (!match) {
+    els.teamPage.innerHTML = `<a class="back-link" href="#fixtures">&larr; Back to fixtures</a><section class="panel"><p class="rank-meta">Match not found.</p></section>`;
+    return;
+  }
+
+  const home = teamById(match.home);
+  const away = teamById(match.away);
+  const score = match.homeScore === null || match.awayScore === null ? "vs" : `${match.homeScore} - ${match.awayScore}`;
+  const detailEvents = renderMatchEvents({ ...match, id: `detail-${match.id}` }, true) || `<p class="rank-meta">Score details will appear here after the match events are added.</p>`;
+
+  els.teamPage.innerHTML = `
+    <a class="back-link" href="#fixtures">&larr; Back to fixtures</a>
+    <article class="match-detail-page">
+      <div class="match-detail-meta">
+        <strong>${formatDate(match)}</strong>
+        ${match.time ? `<span>${formatTime(match)}</span>` : ""}
+        ${match.venue ? `<span>${match.venue}</span>` : ""}
+        <span class="status-pill status-${match.status}">${match.status}</span>
+      </div>
+      <div class="match-detail-score">
+        <div class="team-side">
+          ${crestMarkup(home)}
+          <strong>${teamLink(home)}</strong>
+        </div>
+        <div class="scoreline featured-score"><span>${score}</span></div>
+        <div class="team-side away">
+          <strong>${teamLink(away)}</strong>
+          ${crestMarkup(away)}
+        </div>
+      </div>
+      ${detailEvents}
+      <a class="facebook-share-button large" href="${escapeAttr(facebookShareUrl(match))}" target="_blank" rel="noopener" aria-label="Share ${escapeAttr(matchShareText(match))} on Facebook" title="Share on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></a>
+    </article>
+  `;
+}
+
 function renderStoryPage(storyId) {
   const story = state.news.find((item) => storySlug(item) === storyId);
   if (!story) {
@@ -785,6 +853,7 @@ function renderStoryPage(storyId) {
 function renderRoute() {
   const teamMatch = window.location.hash.match(/^#team\/(.+)$/);
   const storyMatch = window.location.hash.match(/^#story\/(.+)$/);
+  const matchRoute = window.location.hash.match(/^#match\/(.+)$/);
   const homeSections = document.querySelectorAll("main > section:not(#teamPage)");
 
   if (teamMatch) {
@@ -794,6 +863,11 @@ function renderRoute() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   } else if (storyMatch) {
     renderStoryPage(storyMatch[1]);
+    els.teamPage.classList.remove("is-hidden");
+    homeSections.forEach((section) => section.classList.add("is-hidden"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (matchRoute) {
+    renderMatchPage(matchRoute[1]);
     els.teamPage.classList.remove("is-hidden");
     homeSections.forEach((section) => section.classList.add("is-hidden"));
     window.scrollTo({ top: 0, behavior: "smooth" });
