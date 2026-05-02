@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BAFSL | Bay Area Friendly Soccer League</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="BAFSL home">
+        <span class="brand-mark"><img src="assets/bafsl-logo.png" alt="" /></span>
+        <span>
+          <strong>BAFSL</strong>
+          <small>Bay Area Friendly Soccer League</small>
+        </span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="#fixtures">Fixtures</a>
+        <a href="#teams">Teams</a>
+        <a href="#table">Table</a>
+        <a href="#scorers">Scorers</a>
+        <a href="#stats">Stats</a>
+        <a href="#news">News</a>
+      </nav>
+      <button class="icon-button" id="adminOpen" type="button" aria-label="Open admin panel" title="Admin login">
+        <span aria-hidden="true">⚙</span>
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-label="BAFSL overview">
+        <img src="assets/bafsl-hero.png" alt="Community soccer match at golden hour" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="league-tag">Premier League 2026-27</p>
+          <h1>BAFSL</h1>
+          <p class="hero-copy">Bay Area Friendly Soccer League match center for fixtures, live results, division tables, scorers, stats, and league news.</p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#fixtures">View Fixtures</a>
+            <a class="secondary-action" href="#table">Points Table</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="ticker" aria-label="League highlights">
+        <div>
+          <span class="ticker-label">Next Up</span>
+          <strong id="nextMatchText">Loading fixture</strong>
+        </div>
+        <div>
+          <span class="ticker-label">Top Scorer</span>
+          <strong id="topScorerText">Loading scorer</strong>
+        </div>
+        <div>
+          <span class="ticker-label">Goals</span>
+          <strong id="goalCountText">Loading goals</strong>
+        </div>
+      </section>
+
+      <section class="content-shell team-page is-hidden" id="teamPage"></section>
+
+      <section class="content-shell live-layout" id="fixtures">
+        <aside class="sidebar">
+          <div class="section-heading compact">
+            <span>Leagues & Seasons</span>
+            <h2>League Center</h2>
+          </div>
+          <div class="league-list" id="leagueTabs" role="tablist" aria-label="Leagues and seasons"></div>
+          <div class="season-list is-hidden" id="seasonTabs" role="tablist" aria-label="Seasons"></div>
+          <div class="division-list is-hidden" id="divisionTabs" role="tablist" aria-label="Divisions"></div>
+        </aside>
+
+        <section class="match-panel">
+          <div class="section-heading">
+            <span id="selectedDivisionLabel">Division</span>
+            <h2>Fixtures & Results</h2>
+          </div>
+          <div class="match-filters" id="matchFilters" aria-label="Match filters">
+            <button class="filter-button is-active" type="button" data-filter="all">All</button>
+            <button class="filter-button" type="button" data-filter="upcoming">Upcoming</button>
+            <button class="filter-button" type="button" data-filter="live">Live</button>
+            <button class="filter-button" type="button" data-filter="completed">Results</button>
+          </div>
+          <div class="match-list" id="matchList"></div>
+        </section>
+      </section>
+
+      <section class="content-shell" id="teams">
+        <div class="section-heading">
+          <span>Clubs</span>
+          <h2>Meet The Teams</h2>
+        </div>
+        <div class="team-grid" id="teamGrid"></div>
+      </section>
+
+      <section class="content-shell table-layout" id="table">
+        <div class="section-heading">
+          <span>Standings</span>
+          <h2>Points Table</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Club</th>
+                <th>P</th>
+                <th>W</th>
+                <th>D</th>
+                <th>L</th>
+                <th>GF</th>
+                <th>GA</th>
+                <th>GD</th>
+                <th>Pts</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-shell stats-grid">
+        <section id="scorers" class="panel">
+          <div class="section-heading">
+            <span>Golden Boot</span>
+            <h2>Top Scorers</h2>
+          </div>
+          <div class="rank-list" id="scorerList"></div>
+        </section>
+
+        <section id="stats" class="panel">
+          <div class="section-heading">
+            <span>Playmakers</span>
+            <h2>Top Assists</h2>
+          </div>
+          <div class="rank-list" id="assistList"></div>
+        </section>
+      </section>
+
+      <section class="content-shell stats-grid">
+        <section class="panel">
+          <div class="section-heading">
+            <span>Numbers</span>
+            <h2>Season Stats</h2>
+          </div>
+          <div class="stat-cards" id="leagueStats"></div>
+        </section>
+      </section>
+
+      <section class="content-shell" id="news">
+        <div class="section-heading">
+          <span>Stories</span>
+          <h2>News & Updates</h2>
+        </div>
+        <div class="news-grid" id="newsGrid"></div>
+      </section>
+
+      <section class="admin-strip">
+        <button class="text-button" id="adminOpenSecondary" type="button">Admin Login</button>
+      </section>
+    </main>
+
+    <dialog class="admin-dialog" id="adminDialog" aria-labelledby="adminTitle">
+      <div class="dialog-bar">
+        <div>
+          <span class="mini-label">League Office</span>
+          <h2 id="adminTitle">Admin Panel</h2>
+        </div>
+        <button class="icon-button" id="adminClose" type="button" aria-label="Close admin panel" title="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <form class="login-box" id="loginForm">
+        <p class="admin-hint">Prototype login: <strong>admin</strong> / <strong>bafsl2026</strong></p>
+        <label>
+          Username
+          <input name="username" autocomplete="username" required />
+        </label>
+        <label>
+          Password
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="primary-action full" type="submit">Sign In</button>
+        <p class="form-message" id="loginMessage" role="status"></p>
+      </form>
+
+      <div class="admin-workspace is-hidden" id="adminWorkspace">
+        <div class="admin-tabs" role="tablist" aria-label="Admin tools">
+          <button class="admin-tab is-active" type="button" data-admin-view="scores">Game Scores</button>
+          <button class="admin-tab" type="button" data-admin-view="fixtures">Fixtures</button>
+          <button class="admin-tab" type="button" data-admin-view="teams">Teams</button>
+          <button class="admin-tab" type="button" data-admin-view="stories">Stories</button>
+        </div>
+
+        <section class="admin-view" data-view="scores">
+          <form id="scoreForm" class="admin-form">
+            <label>
+              Match
+              <select name="matchId" id="scoreMatchSelect"></select>
+            </label>
+            <div class="form-row">
+              <label>
+                Home Score
+                <input name="homeScore" type="number" min="0" />
+              </label>
+              <label>
+                Away Score
+                <input name="awayScore" type="number" min="0" />
+              </label>
+            </div>
+            <label>
+              Status
+              <select name="status">
+                <option value="upcoming">Upcoming</option>
+                <option value="live">Live</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
+            <label>
+              Goals, Assists & Cards
+              <textarea name="events" rows="5" placeholder="One event per line: Type, Team, Player, Assist&#10;Examples:&#10;goal, SVFC, Samuel, Kevin&#10;yellow, KBFC, Fahim&#10;red, FCBB, Sirat"></textarea>
+            </label>
+            <button class="primary-action full" type="submit">Update Score</button>
+          </form>
+        </section>
+
+        <section class="admin-view is-hidden" data-view="fixtures">
+          <form id="fixtureForm" class="admin-form">
+            <label>
+              Fixture
+              <select name="fixtureId" id="fixtureSelect"></select>
+            </label>
+            <div class="form-row">
+              <label>
+                Division
+                <select name="division" id="fixtureDivision"></select>
+              </label>
+              <label>
+                Date
+                <input name="date" type="date" required />
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                Time
+                <input name="time" type="time" />
+              </label>
+              <label>
+                Venue
+                <input name="venue" />
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                Home Team
+                <select name="home" id="fixtureHome"></select>
+              </label>
+              <label>
+                Away Team
+                <select name="away" id="fixtureAway"></select>
+              </label>
+            </div>
+            <div class="form-row">
+              <button class="secondary-form-action" id="newFixtureButton" type="button">New Fixture</button>
+              <button class="danger-action" id="deleteFixtureButton" type="button">Remove Fixture</button>
+              <button class="primary-action full" id="fixtureSubmit" type="submit">Save Fixture</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="admin-view is-hidden" data-view="teams">
+          <form id="teamForm" class="admin-form">
+            <div class="form-row two-column">
+              <label>
+                Division
+                <select name="division" id="teamDivision"></select>
+              </label>
+              <label>
+                Team Name
+                <input name="name" required />
+              </label>
+              <label>
+                Short Name
+                <input name="shortName" maxlength="5" required />
+              </label>
+            </div>
+            <button class="primary-action full" type="submit">Add Team</button>
+          </form>
+        </section>
+
+        <section class="admin-view is-hidden" data-view="stories">
+          <form id="storyForm" class="admin-form">
+            <div class="form-row two-column">
+              <label>
+                Category
+                <input name="category" required />
+              </label>
+              <label>
+                Date
+                <input name="date" placeholder="May 3, 2026" required />
+              </label>
+            </div>
+            <label>
+              Title
+              <input name="title" required />
+            </label>
+            <label>
+              Summary
+              <textarea name="summary" rows="3" required></textarea>
+            </label>
+            <label>
+              Full Story
+              <textarea name="body" rows="7" required></textarea>
+            </label>
+            <label>
+              Image Path
+              <input name="image" placeholder="assets/news/story-image.png" />
+            </label>
+            <button class="primary-action full" type="submit">Add Story</button>
+          </form>
+        </section>
+
+        <p class="form-message" id="adminMessage" role="status"></p>
+        <div class="admin-backup">
+          <button class="secondary-form-action" id="downloadDataButton" type="button">Download Data Backup</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
