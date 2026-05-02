@@ -357,9 +357,27 @@ function fallbackCopyText(text) {
   field.focus();
   field.select();
   field.setSelectionRange(0, field.value.length);
-  const copied = document.execCommand("copy");
+  document.execCommand("copy");
   field.remove();
-  return copied;
+  return true;
+}
+
+function showShareToast(message) {
+  let toast = document.querySelector(".share-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "share-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(showShareToast.timer);
+  showShareToast.timer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 1800);
 }
 
 async function copyMatchLink(button) {
@@ -386,6 +404,7 @@ async function copyMatchLink(button) {
 
   button.classList.add("is-copied");
   button.setAttribute("aria-label", `Copied ${matchShareText(match)} link`);
+  showShareToast("Share link copied");
   window.setTimeout(() => {
     button.classList.remove("is-copied");
     button.setAttribute("aria-label", `Copy ${matchShareText(match)} link`);
