@@ -343,10 +343,53 @@ function matchShareText(match) {
   return `${home.name} ${score} ${away.name} | ${dateTime}${venue} | BAFSL`;
 }
 
-function facebookShareUrl(match) {
-  const hash = matchShareHash(match);
-  const url = absoluteUrl(hash);
-  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(matchShareText(match))}`;
+function matchShareUrl(match) {
+  return absoluteUrl(matchShareHash(match));
+}
+
+function fallbackCopyText(text) {
+  const field = document.createElement("textarea");
+  field.value = text;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.left = "-9999px";
+  document.body.appendChild(field);
+  field.focus();
+  field.select();
+  field.setSelectionRange(0, field.value.length);
+  const copied = document.execCommand("copy");
+  field.remove();
+  return copied;
+}
+
+async function copyMatchLink(button) {
+  const match = state.matches.find((item) => item.id === button.dataset.shareMatch);
+  if (!match) return;
+
+  const url = matchShareUrl(match);
+  let copied = false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      copied = true;
+    }
+  } catch {
+    copied = false;
+  }
+
+  if (!copied) copied = fallbackCopyText(url);
+
+  if (!copied) {
+    window.prompt("Copy this match link", url);
+    return;
+  }
+
+  button.classList.add("is-copied");
+  button.setAttribute("aria-label", `Copied ${matchShareText(match)} link`);
+  window.setTimeout(() => {
+    button.classList.remove("is-copied");
+    button.setAttribute("aria-label", `Copy ${matchShareText(match)} link`);
+  }, 1400);
 }
 
 function teamLink(team, className = "") {
@@ -483,7 +526,7 @@ function renderMatches() {
       : `<span>${score}</span>`;
     return `
       <article class="match-card">
-        <a class="facebook-share-button" href="${escapeAttr(facebookShareUrl(match))}" target="_blank" rel="noopener" aria-label="Share ${escapeAttr(matchShareText(match))} on Facebook" title="Share on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></a>
+        <button class="match-share-button" type="button" data-share-match="${match.id}" aria-label="Copy ${escapeAttr(matchShareText(match))} link" title="Copy match link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></button>
         <div class="match-meta">
           <strong>${formatDate(match)}</strong><br />
           ${match.time ? `${formatTime(match)}<br />` : ""}
@@ -824,7 +867,7 @@ function renderMatchPage(matchId) {
         </div>
       </div>
       ${detailEvents}
-      <a class="facebook-share-button large" href="${escapeAttr(facebookShareUrl(match))}" target="_blank" rel="noopener" aria-label="Share ${escapeAttr(matchShareText(match))} on Facebook" title="Share on Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></a>
+      <button class="match-share-button large" type="button" data-share-match="${match.id}" aria-label="Copy ${escapeAttr(matchShareText(match))} link" title="Copy match link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></button>
     </article>
   `;
 }
@@ -949,6 +992,12 @@ els.matchFilters.addEventListener("click", (event) => {
   state.selectedFilter = button.dataset.filter;
   document.querySelectorAll(".filter-button").forEach((item) => item.classList.toggle("is-active", item === button));
   renderMatches();
+});
+
+document.addEventListener("click", (event) => {
+  const shareButton = event.target.closest("[data-share-match]");
+  if (!shareButton) return;
+  copyMatchLink(shareButton);
 });
 
 els.matchList.addEventListener("click", (event) => {

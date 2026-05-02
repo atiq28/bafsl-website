@@ -675,13 +675,15 @@ h1 {
   color: #166534;
 }
 
-.facebook-share-button {
+.match-share-button {
   align-items: center;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--field-dark);
+  cursor: pointer;
   display: inline-flex;
+  font: inherit;
   height: 34px;
   justify-content: center;
   line-height: 1;
@@ -692,19 +694,24 @@ h1 {
   width: 34px;
 }
 
-.facebook-share-button svg {
+.match-share-button svg {
   fill: currentColor;
   height: 17px;
   width: 17px;
 }
 
-.facebook-share-button:hover {
+.match-share-button:hover,
+.match-share-button.is-copied {
   background: #e4f7eb;
   border-color: #b7dec7;
   color: var(--field-dark);
 }
 
-.facebook-share-button.large {
+.match-share-button.is-copied svg {
+  transform: scale(0.86);
+}
+
+.match-share-button.large {
   height: 38px;
   right: 18px;
   top: 18px;
