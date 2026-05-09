@@ -59,6 +59,17 @@ const defaultState = {
     { id: "story-opening-fixtures", category: "Fixtures", title: "Opening fixtures published", body: "The 2026-27 fixture graphic is available for captains and players to follow matchday planning.", date: "May 1, 2026", image: "assets/news/fixture-26-27.png" },
     { id: "story-final-schedule", category: "Schedule", title: "Final schedule released", body: "BAFSL has shared the final schedule artwork for the 2026-27 season.", date: "May 1, 2026", image: "assets/news/final-schedule.png" }
   ],
+  blogs: [
+    {
+      id: "blog-hawa-theke-pawa-kickoff",
+      title: "হাওয়া থেকে পাওয়া শুরু হলো",
+      excerpt: "BAFSL মাঠের বাইরের গল্প, ম্যাচডে অনুভূতি, আর কমিউনিটির ছোট ছোট মুহূর্ত নিয়ে নতুন ব্লগ।",
+      body: "হাওয়া থেকে পাওয়া BAFSL-এর গল্পের জায়গা। এখানে থাকবে মাঠের বাইরের কথাগুলো, খেলোয়াড়দের স্মৃতি, ম্যাচডের আবহ, আর Bay Area ফুটবল কমিউনিটির ছোট ছোট মুহূর্ত।",
+      date: "May 3, 2026",
+      author: "BAFSL",
+      image: "assets/bafsl-hero.png"
+    }
+  ],
   standingsOverrides: {
     "premier-2025-26-main": [
       { team: "svfc-2025", played: 6, won: 5, drawn: 0, lost: 1, gf: "-", ga: "-", gd: "-", points: 15 },
@@ -101,6 +112,7 @@ const els = {
   assistList: document.querySelector("#assistList"),
   leagueStats: document.querySelector("#leagueStats"),
   newsGrid: document.querySelector("#newsGrid"),
+  blogGrid: document.querySelector("#blogGrid"),
   nextMatchText: document.querySelector("#nextMatchText"),
   topScorerText: document.querySelector("#topScorerText"),
   goalCountText: document.querySelector("#goalCountText"),
@@ -121,6 +133,11 @@ const els = {
   deleteFixtureButton: document.querySelector("#deleteFixtureButton"),
   teamForm: document.querySelector("#teamForm"),
   teamDivision: document.querySelector("#teamDivision"),
+  blogForm: document.querySelector("#blogForm"),
+  blogSelect: document.querySelector("#blogSelect"),
+  blogSubmit: document.querySelector("#blogSubmit"),
+  newBlogButton: document.querySelector("#newBlogButton"),
+  deleteBlogButton: document.querySelector("#deleteBlogButton"),
   storyForm: document.querySelector("#storyForm"),
   downloadDataButton: document.querySelector("#downloadDataButton")
 };
@@ -312,12 +329,17 @@ function formatTime(match) {
 }
 
 function slugify(value) {
-  return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return value.toLowerCase().trim().replace(/[^\p{L}\p{M}\p{N}]+/gu, "-").replace(/(^-|-$)/g, "") || "post";
 }
 
 function storySlug(story) {
   if (!story.id) story.id = `story-${slugify(story.title)}-${Date.now().toString().slice(-5)}`;
   return story.id;
+}
+
+function blogSlug(post) {
+  if (!post.id) post.id = `blog-${slugify(post.title)}-${Date.now().toString().slice(-5)}`;
+  return post.id;
 }
 
 function absoluteUrl(hash = "") {
@@ -326,8 +348,65 @@ function absoluteUrl(hash = "") {
   return `${base}${hash}`;
 }
 
+function routeUrl(params = "", hash = "") {
+  const localHost = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+  const base = window.location.protocol === "file:" || localHost ? "https://bafsl.com/" : `${window.location.origin}${window.location.pathname}`;
+  return `${base}${params}${hash}`;
+}
+
+function blogPageHref(post) {
+  return `?blog=${encodeURIComponent(blogSlug(post))}`;
+}
+
+function blogIndexHref() {
+  return `${window.location.pathname}#blog`;
+}
+
+function absoluteAssetUrl(path) {
+  if (/^https?:\/\//i.test(path)) return path;
+  const localHost = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+  const base = window.location.protocol === "file:" || localHost ? "https://bafsl.com/" : `${window.location.origin}/`;
+  return new URL(path.replace(/^\//, ""), base).toString();
+}
+
 function escapeAttr(value) {
   return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function setMeta(selector, value) {
+  const tag = document.head.querySelector(selector);
+  if (tag) tag.setAttribute("content", value);
+}
+
+function resetMeta() {
+  document.title = "BAFSL | Bay Area Friendly Soccer League";
+  setMeta('meta[name="description"]', "Follow BAFSL with current fixtures, match results, points tables, top scorers, assists, team rosters, and Bay Area league stories.");
+  setMeta('meta[property="og:type"]', "website");
+  setMeta('meta[property="og:title"]', "BAFSL - Bay Area Friendly Soccer League");
+  setMeta('meta[property="og:description"]', "The home for BAFSL fixtures, scores, tables, scorers, assists, team rosters, and league stories across Premier and Pioneer seasons.");
+  setMeta('meta[property="og:url"]', "https://bafsl.com/");
+  setMeta('meta[property="og:image"]', "https://bafsl.com/assets/bafsl-hero.png");
+  setMeta('meta[property="og:image:secure_url"]', "https://bafsl.com/assets/bafsl-hero.png");
+  setMeta('meta[name="twitter:title"]', "BAFSL - Bay Area Friendly Soccer League");
+  setMeta('meta[name="twitter:description"]', "Fixtures, scores, tables, scorers, assists, team rosters, and league stories for BAFSL.");
+  setMeta('meta[name="twitter:image"]', "https://bafsl.com/assets/bafsl-hero.png");
+}
+
+function setBlogMeta(post) {
+  const title = `${post.title} | হাওয়া থেকে পাওয়া | BAFSL`;
+  const description = post.excerpt || post.body || "হাওয়া থেকে পাওয়া blog post from BAFSL.";
+  const image = post.image ? absoluteAssetUrl(post.image) : "https://bafsl.com/assets/bafsl-hero.png";
+  document.title = title;
+  setMeta('meta[name="description"]', description);
+  setMeta('meta[property="og:type"]', "article");
+  setMeta('meta[property="og:title"]', title);
+  setMeta('meta[property="og:description"]', description);
+  setMeta('meta[property="og:url"]', blogShareUrl(post));
+  setMeta('meta[property="og:image"]', image);
+  setMeta('meta[property="og:image:secure_url"]', image);
+  setMeta('meta[name="twitter:title"]', title);
+  setMeta('meta[name="twitter:description"]', description);
+  setMeta('meta[name="twitter:image"]', image);
 }
 
 function matchShareHash(match) {
@@ -345,6 +424,18 @@ function matchShareText(match) {
 
 function matchShareUrl(match) {
   return absoluteUrl(matchShareHash(match));
+}
+
+function blogShareHash(post) {
+  return `#blog/${encodeURIComponent(blogSlug(post))}`;
+}
+
+function blogShareText(post) {
+  return `${post.title} | হাওয়া থেকে পাওয়া | BAFSL`;
+}
+
+function blogShareUrl(post) {
+  return routeUrl(`?blog=${encodeURIComponent(blogSlug(post))}`);
 }
 
 function fallbackCopyText(text) {
@@ -408,6 +499,37 @@ async function copyMatchLink(button) {
   window.setTimeout(() => {
     button.classList.remove("is-copied");
     button.setAttribute("aria-label", `Copy ${matchShareText(match)} link`);
+  }, 1400);
+}
+
+async function copyBlogLink(button) {
+  const post = (state.blogs || []).find((item) => blogSlug(item) === button.dataset.shareBlog);
+  if (!post) return;
+
+  const url = blogShareUrl(post);
+  let copied = false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      copied = true;
+    }
+  } catch {
+    copied = false;
+  }
+
+  if (!copied) copied = fallbackCopyText(url);
+
+  if (!copied) {
+    window.prompt("Copy this blog link", url);
+    return;
+  }
+
+  button.classList.add("is-copied");
+  button.setAttribute("aria-label", `Copied ${blogShareText(post)} link`);
+  showShareToast("Blog link copied");
+  window.setTimeout(() => {
+    button.classList.remove("is-copied");
+    button.setAttribute("aria-label", `Copy ${blogShareText(post)} link`);
   }, 1400);
 }
 
@@ -726,6 +848,28 @@ function renderNews() {
   `).join("");
 }
 
+function renderBlog() {
+  const posts = state.blogs || [];
+  if (!posts.length) {
+    els.blogGrid.innerHTML = `<p class="rank-meta">হাওয়া থেকে পাওয়া posts will be added soon.</p>`;
+    return;
+  }
+
+  els.blogGrid.innerHTML = posts.map((post) => `
+    <article class="blog-card ${post.image ? "has-image" : ""}">
+      <button class="match-share-button blog-share-button" type="button" data-share-blog="${blogSlug(post)}" aria-label="Copy ${escapeAttr(blogShareText(post))} link" title="Copy blog link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></button>
+      <a class="blog-card-link" href="${blogPageHref(post)}">
+        ${post.image ? `<img src="${post.image}" alt="${post.title}" />` : ""}
+        <span class="blog-card-body">
+          <span class="mini-label">${post.author || "BAFSL"} &middot; ${post.date}</span>
+          <span class="blog-title">${post.title}</span>
+          <span class="blog-summary">${post.excerpt || post.body}</span>
+        </span>
+      </a>
+    </article>
+  `).join("");
+}
+
 function renderAdminOptions() {
   const divisionOptions = state.divisions.map((division) => `<option value="${division.id}">${leagueById(division.league).name} &middot; ${seasonById(division.season).name}</option>`).join("");
   els.fixtureDivision.innerHTML = divisionOptions;
@@ -746,9 +890,17 @@ function renderAdminOptions() {
   `;
   els.fixtureSelect.value = state.matches.some((match) => match.id === selectedFixture) ? selectedFixture : "new";
 
+  const selectedBlog = els.blogSelect.value;
+  els.blogSelect.innerHTML = `
+    <option value="new">New blog post</option>
+    ${(state.blogs || []).map((post) => `<option value="${blogSlug(post)}">${post.title}</option>`).join("")}
+  `;
+  els.blogSelect.value = (state.blogs || []).some((post) => blogSlug(post) === selectedBlog) ? selectedBlog : "new";
+
   renderFixtureTeamOptions();
   populateScoreForm();
   populateFixtureForm();
+  populateBlogForm();
 }
 
 function renderFixtureTeamOptions() {
@@ -782,6 +934,29 @@ function populateFixtureForm() {
   els.fixtureForm.elements.venue.value = match.venue;
   els.fixtureHome.value = match.home;
   els.fixtureAway.value = match.away;
+}
+
+function populateBlogForm() {
+  const post = (state.blogs || []).find((item) => blogSlug(item) === els.blogSelect.value);
+  els.blogSubmit.textContent = post ? "Update Blog Post" : "Add Blog Post";
+  els.deleteBlogButton.disabled = !post;
+
+  if (!post) {
+    els.blogForm.elements.date.value = "";
+    els.blogForm.elements.author.value = "";
+    els.blogForm.elements.title.value = "";
+    els.blogForm.elements.excerpt.value = "";
+    els.blogForm.elements.body.value = "";
+    els.blogForm.elements.image.value = "";
+    return;
+  }
+
+  els.blogForm.elements.date.value = post.date || "";
+  els.blogForm.elements.author.value = post.author || "";
+  els.blogForm.elements.title.value = post.title || "";
+  els.blogForm.elements.excerpt.value = post.excerpt || "";
+  els.blogForm.elements.body.value = post.body || "";
+  els.blogForm.elements.image.value = post.image || "";
 }
 
 function parseEvents(value) {
@@ -912,28 +1087,64 @@ function renderStoryPage(storyId) {
   `;
 }
 
+function renderBlogPage(postId) {
+  const post = (state.blogs || []).find((item) => blogSlug(item) === decodeURIComponent(postId));
+  if (!post) {
+    resetMeta();
+    els.teamPage.innerHTML = `<a class="back-link" href="${blogIndexHref()}">&larr; Back to হাওয়া থেকে পাওয়া</a><section class="panel"><p class="rank-meta">Blog post not found.</p></section>`;
+    return;
+  }
+
+  setBlogMeta(post);
+  els.teamPage.innerHTML = `
+    <a class="back-link" href="${blogIndexHref()}">&larr; Back to হাওয়া থেকে পাওয়া</a>
+    <article class="blog-page">
+      <button class="match-share-button large" type="button" data-share-blog="${blogSlug(post)}" aria-label="Copy ${escapeAttr(blogShareText(post))} link" title="Copy blog link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></button>
+      ${post.image ? `<img src="${post.image}" alt="${post.title}" />` : ""}
+      <div class="blog-content">
+        <span class="mini-label">হাওয়া থেকে পাওয়া</span>
+        <h2>${post.title}</h2>
+        <p class="rank-meta">${post.date}${post.author ? ` &middot; ${post.author}` : ""}</p>
+        <p class="blog-standfirst">${post.excerpt || ""}</p>
+        <p>${post.body}</p>
+      </div>
+    </article>
+  `;
+}
+
 function renderRoute() {
   const teamMatch = window.location.hash.match(/^#team\/(.+)$/);
   const storyMatch = window.location.hash.match(/^#story\/(.+)$/);
+  const blogParam = new URLSearchParams(window.location.search).get("blog");
+  const blogMatch = window.location.hash.match(/^#blog\/(.+)$/);
   const matchRoute = window.location.hash.match(/^#match\/(.+)$/);
   const homeSections = document.querySelectorAll("main > section:not(#teamPage)");
 
   if (teamMatch) {
+    resetMeta();
     renderTeamPage(teamMatch[1]);
     els.teamPage.classList.remove("is-hidden");
     homeSections.forEach((section) => section.classList.add("is-hidden"));
     window.scrollTo({ top: 0, behavior: "smooth" });
   } else if (storyMatch) {
+    resetMeta();
     renderStoryPage(storyMatch[1]);
     els.teamPage.classList.remove("is-hidden");
     homeSections.forEach((section) => section.classList.add("is-hidden"));
     window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (blogParam || blogMatch) {
+    renderBlogPage(blogParam || blogMatch[1]);
+    els.teamPage.classList.remove("is-hidden");
+    homeSections.forEach((section) => section.classList.add("is-hidden"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
   } else if (matchRoute) {
+    resetMeta();
     renderMatchPage(matchRoute[1]);
     els.teamPage.classList.remove("is-hidden");
     homeSections.forEach((section) => section.classList.add("is-hidden"));
     window.scrollTo({ top: 0, behavior: "smooth" });
   } else {
+    resetMeta();
     els.teamPage.classList.add("is-hidden");
     homeSections.forEach((section) => section.classList.remove("is-hidden"));
   }
@@ -946,6 +1157,7 @@ function renderAll() {
   renderStandings();
   renderStats();
   renderNews();
+  renderBlog();
   renderAdminOptions();
   renderRoute();
 }
@@ -969,6 +1181,13 @@ document.querySelectorAll("#adminOpen, #adminOpenSecondary").forEach((button) =>
 });
 
 document.querySelector("#adminClose").addEventListener("click", () => els.adminDialog.close());
+
+document.querySelector(".main-nav").addEventListener("click", (event) => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link || !window.location.search) return;
+  event.preventDefault();
+  window.location.href = `${window.location.pathname}${link.getAttribute("href")}`;
+});
 
 els.leagueTabs.addEventListener("click", (event) => {
   const seasonButton = event.target.closest("[data-season]");
@@ -1015,8 +1234,15 @@ els.matchFilters.addEventListener("click", (event) => {
 
 document.addEventListener("click", (event) => {
   const shareButton = event.target.closest("[data-share-match]");
-  if (!shareButton) return;
-  copyMatchLink(shareButton);
+  if (shareButton) {
+    copyMatchLink(shareButton);
+    return;
+  }
+
+  const blogShareButton = event.target.closest("[data-share-blog]");
+  if (blogShareButton) {
+    copyBlogLink(blogShareButton);
+  }
 });
 
 els.matchList.addEventListener("click", (event) => {
@@ -1186,6 +1412,61 @@ els.teamForm.addEventListener("submit", (event) => {
   renderAll();
   event.currentTarget.reset();
   els.adminMessage.textContent = "Team added.";
+});
+
+els.blogSelect.addEventListener("change", populateBlogForm);
+
+els.newBlogButton.addEventListener("click", () => {
+  els.blogForm.reset();
+  els.blogSelect.value = "new";
+  els.blogSubmit.textContent = "Add Blog Post";
+  els.deleteBlogButton.disabled = true;
+  els.adminMessage.textContent = "Ready to add a new blog post.";
+});
+
+els.deleteBlogButton.addEventListener("click", () => {
+  const blogId = els.blogSelect.value;
+  const post = (state.blogs || []).find((item) => blogSlug(item) === blogId);
+  if (!post) {
+    els.adminMessage.textContent = "Select an existing blog post to remove.";
+    return;
+  }
+
+  state.blogs = (state.blogs || []).filter((item) => blogSlug(item) !== blogId);
+  saveState({ sync: true });
+  renderAll();
+  els.adminMessage.textContent = "Blog post removed.";
+});
+
+els.blogForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  const title = String(form.get("title")).trim();
+  const blogId = String(form.get("blogId"));
+  const existingPost = (state.blogs || []).find((post) => blogSlug(post) === blogId);
+  const blogData = {
+    title,
+    excerpt: String(form.get("excerpt")).trim(),
+    body: String(form.get("body")).trim(),
+    date: String(form.get("date")).trim(),
+    author: String(form.get("author") || "").trim(),
+    image: String(form.get("image") || "").trim()
+  };
+
+  if (existingPost) {
+    Object.assign(existingPost, blogData);
+    els.adminMessage.textContent = "Blog post updated.";
+  } else {
+    state.blogs = state.blogs || [];
+    state.blogs.unshift({
+      id: `blog-${slugify(title)}-${Date.now().toString().slice(-5)}`,
+      ...blogData
+    });
+    els.adminMessage.textContent = "Blog post added.";
+  }
+
+  saveState({ sync: true });
+  renderAll();
 });
 
 els.storyForm.addEventListener("submit", (event) => {

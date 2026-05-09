@@ -39,6 +39,7 @@
         <a href="#table">Table</a>
         <a href="#scorers">Scorers</a>
         <a href="#stats">Stats</a>
+        <a href="#blog">হাওয়া থেকে পাওয়া</a>
         <a href="#news">News</a>
       </nav>
       <button class="icon-button" id="adminOpen" type="button" aria-label="Open admin panel" title="Admin login">
@@ -165,6 +166,14 @@
         </section>
       </section>
 
+      <section class="content-shell" id="blog">
+        <div class="section-heading">
+          <span>Blog</span>
+          <h2>হাওয়া থেকে পাওয়া</h2>
+        </div>
+        <div class="blog-grid" id="blogGrid"></div>
+      </section>
+
       <section class="content-shell" id="news">
         <div class="section-heading">
           <span>Stories</span>
@@ -207,6 +216,7 @@
           <button class="admin-tab is-active" type="button" data-admin-view="scores">Game Scores</button>
           <button class="admin-tab" type="button" data-admin-view="fixtures">Fixtures</button>
           <button class="admin-tab" type="button" data-admin-view="teams">Teams</button>
+          <button class="admin-tab" type="button" data-admin-view="blog">হাওয়া থেকে পাওয়া</button>
           <button class="admin-tab" type="button" data-admin-view="stories">Stories</button>
         </div>
 
@@ -303,6 +313,46 @@
               </label>
             </div>
             <button class="primary-action full" type="submit">Add Team</button>
+          </form>
+        </section>
+
+        <section class="admin-view is-hidden" data-view="blog">
+          <form id="blogForm" class="admin-form">
+            <label>
+              Blog Post
+              <select name="blogId" id="blogSelect"></select>
+            </label>
+            <div class="form-row two-column">
+              <label>
+                Date
+                <input name="date" placeholder="May 3, 2026" required />
+              </label>
+              <label>
+                Author
+                <input name="author" placeholder="BAFSL" />
+              </label>
+            </div>
+            <label>
+              Title
+              <input name="title" required />
+            </label>
+            <label>
+              Snapshot Summary
+              <textarea name="excerpt" rows="3" required></textarea>
+            </label>
+            <label>
+              Blog Post
+              <textarea name="body" rows="8" required></textarea>
+            </label>
+            <label>
+              Snapshot Image Path
+              <input name="image" placeholder="assets/blog/post-snapshot.png" />
+            </label>
+            <div class="form-row">
+              <button class="secondary-form-action" id="newBlogButton" type="button">New Blog Post</button>
+              <button class="danger-action" id="deleteBlogButton" type="button">Remove Blog Post</button>
+              <button class="primary-action full" id="blogSubmit" type="submit">Save Blog Post</button>
+            </div>
           </form>
         </section>
 
