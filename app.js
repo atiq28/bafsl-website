@@ -371,6 +371,15 @@ function absoluteAssetUrl(path) {
   return new URL(path.replace(/^\//, ""), base).toString();
 }
 
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result || "")));
+    reader.addEventListener("error", () => reject(reader.error));
+    reader.readAsDataURL(file);
+  });
+}
+
 function escapeAttr(value) {
   return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -951,6 +960,8 @@ function populateBlogForm() {
     els.blogForm.elements.excerpt.value = "";
     els.blogForm.elements.body.value = "";
     els.blogForm.elements.image.value = "";
+    els.blogForm.elements.imageFile.value = "";
+    els.blogForm.elements.removeImage.checked = false;
     return;
   }
 
@@ -959,7 +970,9 @@ function populateBlogForm() {
   els.blogForm.elements.title.value = post.title || "";
   els.blogForm.elements.excerpt.value = post.excerpt || "";
   els.blogForm.elements.body.value = post.body || "";
-  els.blogForm.elements.image.value = post.image || "";
+  els.blogForm.elements.image.value = String(post.image || "").startsWith("data:") ? "" : post.image || "";
+  els.blogForm.elements.imageFile.value = "";
+  els.blogForm.elements.removeImage.checked = false;
 }
 
 function parseEvents(value) {
@@ -1441,19 +1454,32 @@ els.deleteBlogButton.addEventListener("click", () => {
   els.adminMessage.textContent = "Blog post removed.";
 });
 
-els.blogForm.addEventListener("submit", (event) => {
+els.blogForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
   const title = String(form.get("title")).trim();
   const blogId = String(form.get("blogId"));
   const existingPost = (state.blogs || []).find((post) => blogSlug(post) === blogId);
+  const imagePath = String(form.get("image") || "").trim();
+  const imageFile = form.get("imageFile");
+  const removeImage = form.get("removeImage") === "on";
+  let image = imagePath;
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    image = await fileToDataUrl(imageFile);
+  } else if (removeImage) {
+    image = "";
+  } else if (!imagePath && existingPost?.image?.startsWith("data:")) {
+    image = existingPost.image;
+  }
+
   const blogData = {
     title,
     excerpt: String(form.get("excerpt")).trim(),
     body: String(form.get("body")).trim(),
     date: String(form.get("date")).trim(),
     author: String(form.get("author") || "").trim(),
-    image: String(form.get("image") || "").trim()
+    image
   };
 
   if (existingPost) {

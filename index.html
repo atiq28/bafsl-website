@@ -345,8 +345,16 @@
               <textarea name="body" rows="8" required></textarea>
             </label>
             <label>
-              Snapshot Image Path
+              Snapshot Image Path (optional)
               <input name="image" placeholder="assets/blog/post-snapshot.png" />
+            </label>
+            <label>
+              Upload Snapshot Image (optional)
+              <input name="imageFile" type="file" accept="image/*" />
+            </label>
+            <label class="checkbox-row">
+              <input name="removeImage" type="checkbox" />
+              Remove image from this blog post
             </label>
             <div class="form-row">
               <button class="secondary-form-action" id="newBlogButton" type="button">New Blog Post</button>

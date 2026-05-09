@@ -1106,6 +1106,17 @@ label {
   width: 100%;
 }
 
+.checkbox-row {
+  align-items: center;
+  background: #f8faf9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+}
+
 input,
 select,
 textarea {
@@ -1120,6 +1131,20 @@ textarea {
 input,
 select {
   min-height: 42px;
+}
+
+input[type="file"],
+input[type="checkbox"] {
+  min-height: 0;
+}
+
+input[type="file"] {
+  padding-bottom: 9px;
+  padding-top: 9px;
+}
+
+input[type="checkbox"] {
+  width: auto;
 }
 
 textarea {
