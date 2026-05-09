@@ -67,7 +67,8 @@ const defaultState = {
       body: "হাওয়া থেকে পাওয়া BAFSL-এর গল্পের জায়গা। এখানে থাকবে মাঠের বাইরের কথাগুলো, খেলোয়াড়দের স্মৃতি, ম্যাচডের আবহ, আর Bay Area ফুটবল কমিউনিটির ছোট ছোট মুহূর্ত।",
       date: "May 3, 2026",
       author: "BAFSL",
-      image: "assets/bafsl-hero.png"
+      image: "assets/bafsl-hero.png",
+      sharePath: "blog/blog-hawa-theke-pawa-kickoff.html"
     }
   ],
   standingsOverrides: {
@@ -355,6 +356,7 @@ function routeUrl(params = "", hash = "") {
 }
 
 function blogPageHref(post) {
+  if (post.sharePath) return post.sharePath;
   return `?blog=${encodeURIComponent(blogSlug(post))}`;
 }
 
@@ -435,6 +437,7 @@ function blogShareText(post) {
 }
 
 function blogShareUrl(post) {
+  if (post.sharePath) return absoluteAssetUrl(post.sharePath);
   return routeUrl(`?blog=${encodeURIComponent(blogSlug(post))}`);
 }
 
