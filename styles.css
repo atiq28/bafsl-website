@@ -659,13 +659,18 @@ h1 {
 }
 
 .status-pill {
+  align-items: center;
   border-radius: 999px;
   display: inline-flex;
   font-size: 11px;
   font-weight: 900;
+  justify-content: center;
+  line-height: 1;
   margin-top: 6px;
+  min-height: 24px;
   padding: 4px 8px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .status-upcoming {
@@ -1436,6 +1441,7 @@ textarea {
   }
 
   .match-meta {
+    align-items: center;
     border-bottom: 1px solid var(--line);
     display: flex;
     flex-wrap: wrap;
@@ -1452,6 +1458,7 @@ textarea {
   }
 
   .status-pill {
+    align-self: center;
     margin-top: 0;
   }
 
@@ -1490,14 +1497,43 @@ textarea {
   }
 
   .event-row {
-    gap: 10px;
-    grid-template-columns: 1fr;
+    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+    min-height: 56px;
+    padding: 10px 12px;
   }
 
   .event-detail.home,
   .event-detail.away {
+    text-align: inherit;
+  }
+
+  .event-detail.home {
+    justify-content: flex-end;
+  }
+
+  .event-detail.away {
     justify-content: flex-start;
-    text-align: left;
+  }
+
+  .event-player {
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .assist-name {
+    font-size: 12px;
+  }
+
+  .event-ball {
+    font-size: 16px;
+    height: 20px;
+    width: 20px;
+  }
+
+  .card-icon {
+    height: 22px;
+    width: 15px;
   }
 
   .match-detail-score {
