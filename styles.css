@@ -1388,12 +1388,16 @@ textarea {
   }
 
   .main-nav a {
+    align-items: center;
     background: #eef4f1;
     border-radius: 999px;
     display: inline-flex;
     flex: 0 0 auto;
+    justify-content: center;
+    line-height: 1;
     min-height: 34px;
     padding: 0 12px;
+    white-space: nowrap;
   }
 
   .site-header .icon-button {
