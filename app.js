@@ -1286,6 +1286,7 @@ els.loginForm.addEventListener("submit", async (event) => {
       els.loginForm.classList.add("is-hidden");
       els.adminWorkspace.classList.remove("is-hidden");
       els.adminMessage.textContent = "Signed in. Live cloud updates are enabled.";
+      document.dispatchEvent(new CustomEvent("bafsl-admin-login"));
       return;
     } catch {
       els.loginMessage.textContent = "Cloud admin login failed. Use your Supabase admin email and password.";
@@ -1298,6 +1299,7 @@ els.loginForm.addEventListener("submit", async (event) => {
     els.loginForm.classList.add("is-hidden");
     els.adminWorkspace.classList.remove("is-hidden");
     els.adminMessage.textContent = "Signed in. Updates are saved in this browser only until cloud sync is configured.";
+    document.dispatchEvent(new CustomEvent("bafsl-admin-login"));
   } else {
     els.loginMessage.textContent = "Those credentials did not match.";
   }

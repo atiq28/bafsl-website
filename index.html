@@ -35,6 +35,7 @@
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="#fixtures">Fixtures</a>
+        <a href="#world-cup">World Cup 2026</a>
         <a href="#teams">Teams</a>
         <a href="#table">Table</a>
         <a href="#scorers">Scorers</a>
@@ -78,6 +79,80 @@
       </section>
 
       <section class="content-shell team-page is-hidden" id="teamPage"></section>
+
+      <section class="content-shell world-cup-section" id="world-cup">
+        <div class="world-cup-teaser">
+          <div>
+            <span class="mini-label">BAFSL Bracket Challenge</span>
+            <h2>World Cup 2026 Bracket Challenge</h2>
+            <p>Make your predictions, keep a branded PDF, and compete on the live leaderboard.</p>
+          </div>
+          <div class="world-cup-teaser-actions">
+            <button class="primary-action" id="worldCupToggle" type="button" aria-expanded="false" aria-controls="worldCupChallengeDetails">Open Challenge</button>
+            <button class="secondary-action" id="worldCupShare" type="button">Share Challenge</button>
+          </div>
+        </div>
+
+        <div class="world-cup-challenge-details is-hidden" id="worldCupChallengeDetails">
+          <div class="world-cup-intro">
+            <div>
+              <span class="mini-label">Build your path to the final</span>
+              <h2>Pick The World Cup 2026</h2>
+              <p>Predict every team that advances from the group stage through the final. Earn more points as your picks go deeper into the tournament.</p>
+            </div>
+            <div class="world-cup-countdown">
+              <strong id="worldCupEntryCount">0</strong>
+              <span>brackets entered</span>
+            </div>
+          </div>
+
+          <div class="world-cup-tabs" role="tablist" aria-label="World Cup challenge">
+            <button class="world-cup-tab is-active" type="button" data-world-cup-view="bracket">Make Picks</button>
+            <button class="world-cup-tab" type="button" data-world-cup-view="leaderboard">Leaderboard</button>
+            <button class="world-cup-tab" type="button" data-world-cup-view="rules">Scoring</button>
+          </div>
+
+          <section class="world-cup-view" data-world-cup-panel="bracket">
+            <form id="worldCupPredictionForm">
+              <div class="world-cup-step" id="worldCupBracket"></div>
+              <div class="world-cup-entry">
+                <div class="form-row">
+                  <label>
+                    Your Name
+                    <input name="name" maxlength="80" autocomplete="name" required />
+                  </label>
+                  <label>
+                    Email Address
+                    <input name="email" type="email" maxlength="160" autocomplete="email" required />
+                  </label>
+                </div>
+                <label class="checkbox-row">
+                  <input name="consent" type="checkbox" required />
+                  I agree that my name can appear on the public leaderboard. My email stays private.
+                </label>
+                <button class="primary-action full" type="submit">Submit My Bracket</button>
+                <button class="secondary-form-action full is-hidden" id="worldCupDownloadPdf" type="button">Download My Prediction PDF</button>
+                <p class="form-message" id="worldCupFormMessage" role="status"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="world-cup-view is-hidden" data-world-cup-panel="leaderboard">
+            <div class="world-cup-leaderboard-head">
+              <div>
+                <span class="mini-label">Live standings</span>
+                <h3>Prediction Leaderboard</h3>
+              </div>
+              <button class="secondary-form-action world-cup-refresh" id="worldCupRefresh" type="button">Refresh</button>
+            </div>
+            <div class="world-cup-leaderboard" id="worldCupLeaderboard"></div>
+          </section>
+
+          <section class="world-cup-view is-hidden" data-world-cup-panel="rules">
+            <div class="world-cup-rules" id="worldCupRules"></div>
+          </section>
+        </div>
+      </section>
 
       <section class="content-shell live-layout" id="fixtures">
         <aside class="sidebar">
@@ -216,6 +291,7 @@
           <button class="admin-tab is-active" type="button" data-admin-view="scores">Game Scores</button>
           <button class="admin-tab" type="button" data-admin-view="fixtures">Fixtures</button>
           <button class="admin-tab" type="button" data-admin-view="teams">Teams</button>
+          <button class="admin-tab" type="button" data-admin-view="world-cup">World Cup</button>
           <button class="admin-tab" type="button" data-admin-view="blog">হাওয়া থেকে পাওয়া</button>
           <button class="admin-tab" type="button" data-admin-view="stories">Stories</button>
         </div>
@@ -316,6 +392,43 @@
           </form>
         </section>
 
+        <section class="admin-view is-hidden" data-view="world-cup">
+          <div class="world-cup-admin-predictions">
+            <div class="world-cup-leaderboard-head">
+              <div>
+                <span class="mini-label">Private admin view</span>
+                <h3>Submitted Predictions</h3>
+              </div>
+              <button class="secondary-form-action world-cup-refresh" id="worldCupAdminRefresh" type="button">Refresh</button>
+            </div>
+            <label>
+              Participant
+              <select id="worldCupPredictionSelect">
+                <option value="">No predictions loaded</option>
+              </select>
+            </label>
+            <div class="world-cup-admin-prediction-detail" id="worldCupPredictionDetail">
+              <p class="rank-meta">Choose a participant to see their complete prediction.</p>
+            </div>
+            <button class="danger-action full" id="worldCupDeletePrediction" type="button" disabled>Delete Selected Entry</button>
+          </div>
+
+          <div class="world-cup-admin-results">
+            <span class="mini-label">Tournament progress</span>
+            <h3>Actual Results</h3>
+          </div>
+          <form id="worldCupResultForm" class="admin-form">
+            <label>
+              Result Category
+              <select name="stage" id="worldCupResultStage"></select>
+            </label>
+            <p class="admin-hint" id="worldCupResultHint"></p>
+            <div class="world-cup-admin-teams" id="worldCupResultTeams"></div>
+            <button class="primary-action full" type="submit">Save Actual Results</button>
+          </form>
+          <div class="world-cup-admin-summary" id="worldCupAdminSummary"></div>
+        </section>
+
         <section class="admin-view is-hidden" data-view="blog">
           <form id="blogForm" class="admin-form">
             <label>
@@ -405,5 +518,9 @@
 
     <script src="config.js"></script>
     <script src="app.js"></script>
+    <script src="vendor/pdf-lib.min.js"></script>
+    <script src="world-cup-third-place.js"></script>
+    <script src="world-cup-scoring.js"></script>
+    <script src="world-cup.js"></script>
   </body>
 </html>
