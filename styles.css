@@ -502,7 +502,7 @@ h1 {
 }
 
 .amateur-roster-card li::before {
-  color: #b87900;
+  color: inherit;
   content: counter(roster-player) ".";
   font-weight: 950;
   text-align: right;
