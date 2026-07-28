@@ -1163,6 +1163,16 @@ function renderRoute() {
     resetMeta();
     els.teamPage.classList.add("is-hidden");
     homeSections.forEach((section) => section.classList.remove("is-hidden"));
+    scrollToCurrentHomeSection();
+  }
+}
+
+function scrollToCurrentHomeSection() {
+  const id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+  if (!id || id.includes("/")) return;
+  const target = document.getElementById(id);
+  if (target) {
+    window.requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
   }
 }
 

@@ -255,6 +255,267 @@ h1 {
   margin-bottom: 5px;
 }
 
+.amateur-section {
+  padding-top: clamp(28px, 5vw, 52px);
+}
+
+.amateur-hero {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(9, 23, 32, 0.78), rgba(123, 23, 16, 0.52)),
+    url("assets/amateur-2026/background-clean.png") center / cover;
+  border-radius: 16px;
+  color: white;
+  display: flex;
+  gap: clamp(18px, 4vw, 42px);
+  justify-content: space-between;
+  overflow: hidden;
+  padding: clamp(24px, 5vw, 52px);
+}
+
+.amateur-hero .mini-label {
+  color: var(--sun);
+}
+
+.amateur-hero h2 {
+  font-size: clamp(38px, 8vw, 86px);
+  line-height: 0.9;
+  margin: 8px 0 16px;
+  text-transform: uppercase;
+}
+
+.amateur-hero p {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(16px, 2.2vw, 20px);
+  line-height: 1.55;
+  max-width: 760px;
+}
+
+.amateur-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.amateur-quick-card {
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  flex: 0 0 230px;
+  padding: 22px;
+}
+
+.amateur-quick-card span,
+.amateur-quick-card small {
+  display: block;
+}
+
+.amateur-quick-card span {
+  color: var(--sun);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.amateur-quick-card strong {
+  display: block;
+  font-size: 76px;
+  line-height: 0.95;
+}
+
+.amateur-quick-card small {
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.45;
+}
+
+.amateur-teams {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.amateur-teams article,
+.amateur-schedule-card,
+.amateur-guide-card,
+.amateur-roster-card,
+.amateur-poster-grid a {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(19, 37, 32, 0.08);
+}
+
+.amateur-teams article {
+  min-height: 132px;
+  padding: 16px;
+}
+
+.amateur-teams img {
+  align-items: center;
+  border-radius: 12px;
+  display: block;
+  height: 74px;
+  margin-bottom: 12px;
+  object-fit: contain;
+  width: 74px;
+}
+
+.amateur-teams strong,
+.amateur-teams small {
+  display: block;
+}
+
+.amateur-teams strong {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.amateur-teams small {
+  color: var(--muted);
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.amateur-subhead {
+  margin-top: clamp(28px, 5vw, 48px);
+}
+
+.amateur-schedule-grid,
+.amateur-guide-grid,
+.amateur-poster-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.amateur-schedule-grid {
+  grid-template-columns: 1.45fr 1fr 1fr;
+}
+
+.amateur-schedule-card,
+.amateur-guide-card,
+.amateur-roster-card {
+  padding: 18px;
+}
+
+.amateur-schedule-card h3,
+.amateur-guide-card h3,
+.amateur-roster-card h3 {
+  color: var(--field-dark);
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+
+.amateur-match {
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+
+.amateur-match:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.amateur-match span,
+.amateur-match small {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.amateur-match strong {
+  display: block;
+  line-height: 1.35;
+  margin: 4px 0;
+}
+
+.amateur-note {
+  background: #fff7df;
+  border: 1px solid #f4d982;
+  border-radius: 8px;
+  color: #5e4300;
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+}
+
+.amateur-guide-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.amateur-guide-card ul,
+.amateur-guide-card ol,
+.amateur-roster-card ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.amateur-guide-card li,
+.amateur-roster-card li {
+  line-height: 1.5;
+  margin: 5px 0;
+}
+
+.amateur-roster-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.amateur-roster-card {
+  display: flex;
+  flex-direction: column;
+  max-height: 620px;
+}
+
+.amateur-roster-card h3 span {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+.amateur-roster-card ol {
+  color: #263a34;
+  font-size: 14px;
+  overflow-y: auto;
+}
+
+.amateur-poster-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(28px, 5vw, 46px);
+}
+
+.amateur-poster-grid a {
+  color: var(--field-dark);
+  display: grid;
+  font-weight: 950;
+  gap: 12px;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.amateur-poster-grid img {
+  border-radius: 8px;
+  display: block;
+  height: 280px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.amateur-poster-grid span {
+  padding: 0 4px 4px;
+}
+
 .content-shell {
   margin: 0 auto;
   max-width: 1240px;
@@ -1844,8 +2105,25 @@ textarea {
   .team-grid,
   .news-grid,
   .blog-grid,
+  .amateur-schedule-grid,
+  .amateur-guide-grid,
+  .amateur-roster-grid,
   .team-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .amateur-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .amateur-quick-card {
+    flex: 1 1 auto;
+  }
+
+  .amateur-teams,
+  .amateur-poster-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .world-cup-groups,
@@ -1989,7 +2267,8 @@ textarea {
   }
 
   .hero-actions,
-  .form-row {
+  .form-row,
+  .amateur-actions {
     flex-direction: column;
   }
 
@@ -2073,6 +2352,8 @@ textarea {
   }
 
   .world-cup-groups,
+  .amateur-teams,
+  .amateur-poster-grid,
   .world-cup-team-picks,
   .world-cup-team-picks.is-small,
   .world-cup-admin-teams,
