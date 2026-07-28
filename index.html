@@ -257,6 +257,68 @@
             <span>Open full roster poster</span>
           </a>
         </div>
+
+        <div class="amateur-challenge" id="amateurChallenge">
+          <div class="amateur-challenge-teaser">
+            <div>
+              <span class="mini-label">Prediction Challenge</span>
+              <h2>Amateur 2026 Bracket Challenge</h2>
+              <p>Predict every match score, the final group ranking, semi-final winners, final score, champion, and bonus awards.</p>
+            </div>
+            <div class="world-cup-teaser-actions">
+              <button class="primary-action" id="amateurChallengeToggle" type="button" aria-expanded="false" aria-controls="amateurChallengeDetails">Open Challenge</button>
+              <button class="secondary-action" id="amateurChallengeShare" type="button">Share Challenge</button>
+            </div>
+          </div>
+
+          <div class="world-cup-challenge-details is-hidden" id="amateurChallengeDetails">
+            <div class="world-cup-tabs" role="tablist" aria-label="Amateur tournament challenge">
+              <button class="world-cup-tab is-active" type="button" data-amateur-view="picks">Make Picks</button>
+              <button class="world-cup-tab" type="button" data-amateur-view="leaderboard">Leaderboard</button>
+              <button class="world-cup-tab" type="button" data-amateur-view="rules">Scoring</button>
+            </div>
+
+            <section class="world-cup-view" data-amateur-panel="picks">
+              <form id="amateurPredictionForm">
+                <div id="amateurBracket"></div>
+                <div class="world-cup-entry">
+                  <div class="form-row">
+                    <label>
+                      Your Name
+                      <input name="name" maxlength="80" autocomplete="name" required />
+                    </label>
+                    <label>
+                      Email Address
+                      <input name="email" type="email" maxlength="160" autocomplete="email" required />
+                    </label>
+                  </div>
+                  <label class="checkbox-row">
+                    <input name="consent" type="checkbox" required />
+                    I agree that my name can appear on the public leaderboard. My email stays private.
+                  </label>
+                  <button class="primary-action full" type="submit">Submit My Prediction</button>
+                  <button class="secondary-form-action full is-hidden" id="amateurDownloadPdf" type="button">Download My Prediction PDF</button>
+                  <p class="form-message" id="amateurFormMessage" role="status"></p>
+                </div>
+              </form>
+            </section>
+
+            <section class="world-cup-view is-hidden" data-amateur-panel="leaderboard">
+              <div class="world-cup-leaderboard-head">
+                <div>
+                  <span class="mini-label">Live standings</span>
+                  <h3>Prediction Leaderboard</h3>
+                </div>
+                <button class="secondary-form-action world-cup-refresh" id="amateurRefresh" type="button">Refresh</button>
+              </div>
+              <div class="world-cup-leaderboard" id="amateurLeaderboard"></div>
+            </section>
+
+            <section class="world-cup-view is-hidden" data-amateur-panel="rules">
+              <div class="world-cup-rules" id="amateurRules"></div>
+            </section>
+          </div>
+        </div>
       </section>
 
       <section class="content-shell team-page is-hidden" id="teamPage"></section>
@@ -472,6 +534,7 @@
           <button class="admin-tab is-active" type="button" data-admin-view="scores">Game Scores</button>
           <button class="admin-tab" type="button" data-admin-view="fixtures">Fixtures</button>
           <button class="admin-tab" type="button" data-admin-view="teams">Teams</button>
+          <button class="admin-tab" type="button" data-admin-view="amateur">Amateur 2026</button>
           <button class="admin-tab" type="button" data-admin-view="world-cup">World Cup</button>
           <button class="admin-tab" type="button" data-admin-view="blog">হাওয়া থেকে পাওয়া</button>
           <button class="admin-tab" type="button" data-admin-view="stories">Stories</button>
@@ -610,6 +673,38 @@
           <div class="world-cup-admin-summary" id="worldCupAdminSummary"></div>
         </section>
 
+        <section class="admin-view is-hidden" data-view="amateur">
+          <div class="world-cup-admin-predictions">
+            <div class="world-cup-leaderboard-head">
+              <div>
+                <span class="mini-label">Private admin view</span>
+                <h3>Amateur Predictions</h3>
+              </div>
+              <button class="secondary-form-action world-cup-refresh" id="amateurAdminRefresh" type="button">Refresh</button>
+            </div>
+            <label>
+              Participant
+              <select id="amateurPredictionSelect">
+                <option value="">No predictions loaded</option>
+              </select>
+            </label>
+            <div class="world-cup-admin-prediction-detail" id="amateurPredictionDetail">
+              <p class="rank-meta">Choose a participant to see their complete prediction.</p>
+            </div>
+            <button class="danger-action full" id="amateurDeletePrediction" type="button" disabled>Delete Selected Entry</button>
+          </div>
+
+          <div class="world-cup-admin-results">
+            <span class="mini-label">Tournament progress</span>
+            <h3>Actual Results</h3>
+          </div>
+          <form id="amateurResultForm" class="admin-form">
+            <div id="amateurResultInputs"></div>
+            <button class="primary-action full" type="submit">Save Amateur Results</button>
+          </form>
+          <p class="admin-hint" id="amateurResultHint"></p>
+        </section>
+
         <section class="admin-view is-hidden" data-view="blog">
           <form id="blogForm" class="admin-form">
             <label>
@@ -703,5 +798,7 @@
     <script src="world-cup-third-place.js"></script>
     <script src="world-cup-scoring.js"></script>
     <script src="world-cup.js"></script>
+    <script src="amateur-challenge-scoring.js"></script>
+    <script src="amateur-challenge.js"></script>
   </body>
 </html>

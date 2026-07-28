@@ -1806,6 +1806,116 @@ textarea {
   gap: 14px;
 }
 
+.amateur-challenge {
+  margin-top: 28px;
+}
+
+.amateur-challenge-teaser {
+  align-items: center;
+  background: linear-gradient(135deg, rgba(4, 21, 38, 0.94), rgba(136, 31, 11, 0.9)), url("assets/amateur-2026/background-clean.png") center/cover;
+  border: 1px solid rgba(255, 186, 41, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 18px 46px rgba(4, 21, 38, 0.18);
+  color: white;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.amateur-challenge-teaser h2 {
+  color: #fff7e0;
+  font-size: clamp(26px, 4vw, 42px);
+  line-height: 1;
+  margin: 6px 0 10px;
+}
+
+.amateur-challenge-teaser p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.45;
+  margin-bottom: 0;
+}
+
+.amateur-challenge-teaser .mini-label {
+  color: var(--sun);
+}
+
+.amateur-pick-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.amateur-score-card {
+  background: #f8faf9;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+}
+
+.amateur-score-card legend {
+  color: var(--field-dark);
+  font-size: 14px;
+  font-weight: 950;
+  padding: 0 6px;
+}
+
+.amateur-score-card.is-locked {
+  opacity: 0.68;
+}
+
+.amateur-match-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.amateur-score-row {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 86px;
+}
+
+.amateur-score-row input {
+  font-size: 18px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.amateur-team-badge {
+  align-items: center;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  font-weight: 900;
+  gap: 10px;
+  min-height: 50px;
+  padding: 8px 10px;
+}
+
+.amateur-team-badge img {
+  height: 34px;
+  object-fit: contain;
+  width: 34px;
+}
+
+.amateur-rank-grid,
+.amateur-bonus-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.amateur-rank-grid label,
+.amateur-bonus-grid label {
+  display: grid;
+}
+
 .world-cup-archive-hero {
   align-items: center;
   background: linear-gradient(135deg, #f8faf9, #edf7f1);
@@ -2129,7 +2239,10 @@ textarea {
   .world-cup-groups,
   .world-cup-team-picks,
   .world-cup-admin-teams,
-  .world-cup-matchups {
+  .world-cup-matchups,
+  .amateur-pick-grid,
+  .amateur-rank-grid,
+  .amateur-bonus-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2142,6 +2255,11 @@ textarea {
   }
 
   .world-cup-teaser {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .amateur-challenge-teaser {
     align-items: stretch;
     flex-direction: column;
   }
@@ -2361,8 +2479,15 @@ textarea {
   .world-cup-archive-grid,
   .world-cup-result-archive,
   .world-cup-rules,
-  .world-cup-admin-summary {
+  .world-cup-admin-summary,
+  .amateur-pick-grid,
+  .amateur-rank-grid,
+  .amateur-bonus-grid {
     grid-template-columns: 1fr;
+  }
+
+  .amateur-score-row {
+    grid-template-columns: 1fr 74px;
   }
 
   .section-heading {
