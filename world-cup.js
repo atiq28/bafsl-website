@@ -1,6 +1,8 @@
 const WORLD_CUP_LOCAL_PREDICTIONS = "bafsl-world-cup-predictions-v1";
 const WORLD_CUP_LOCAL_RESULTS = "bafsl-world-cup-results-v1";
 const WORLD_CUP_ENTRY_DEADLINE = new Date("2026-06-11T00:00:00-07:00");
+const WORLD_CUP_ARCHIVED = true;
+const WORLD_CUP_ARCHIVE_LABEL = "Archived after World Cup 2026";
 
 const WORLD_CUP_GROUPS = {
   A: ["Mexico", "South Africa", "Korea Republic", "Czechia"],
@@ -130,7 +132,7 @@ const worldCupEls = {
 function setWorldCupChallengeOpen(open, options = {}) {
   worldCupEls.details.classList.toggle("is-hidden", !open);
   worldCupEls.toggle.setAttribute("aria-expanded", String(open));
-  worldCupEls.toggle.textContent = open ? "Close Challenge" : "Open Challenge";
+  worldCupEls.toggle.textContent = open ? "Close Archive" : "View Archive";
   worldCupEls.section.classList.toggle("is-open", open);
   if (open && options.scroll) {
     worldCupEls.section.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -146,8 +148,8 @@ async function shareWorldCupChallenge() {
   try {
     if (navigator.share) {
       await navigator.share({
-        title: "BAFSL World Cup 2026 Bracket Challenge",
-        text: "Make your World Cup 2026 predictions and join the BAFSL leaderboard.",
+        title: "BAFSL World Cup 2026 Bracket Challenge Archive",
+        text: "View the archived World Cup 2026 bracket challenge leaderboard and results.",
         url
       });
       return;
@@ -157,9 +159,9 @@ async function shareWorldCupChallenge() {
     } else {
       fallbackCopyText(url);
     }
-    showShareToast("Challenge link copied");
+    showShareToast("Archive link copied");
   } catch (error) {
-    if (error?.name !== "AbortError") window.prompt("Copy this challenge link", url);
+    if (error?.name !== "AbortError") window.prompt("Copy this archive link", url);
   }
 }
 
@@ -344,11 +346,75 @@ function renderWorldCupKnockoutRound(round, step, thirdAssignments) {
 }
 
 function renderWorldCupBracket() {
+  if (WORLD_CUP_ARCHIVED) {
+    worldCupEls.form.classList.add("is-archived");
+    worldCupEls.form.querySelector(".world-cup-entry")?.classList.add("is-hidden");
+    worldCupEls.bracket.innerHTML = renderWorldCupArchive();
+    return;
+  }
+
   const knockout = worldCupKnockoutMatches();
   worldCupEls.bracket.innerHTML = `
     ${renderWorldCupGroupStage()}
     ${renderWorldCupBestThirds(WORLD_CUP_STAGES[2], 2)}
     ${knockout.rounds.map((round, index) => renderWorldCupKnockoutRound(round, index + 3, knockout.thirdAssignments)).join("")}
+  `;
+}
+
+function renderWorldCupArchive() {
+  const champion = worldCupResults.champion?.[0] || "Champion result pending";
+  const completedStages = WORLD_CUP_STAGES.filter((stage) => (worldCupResults[stage.id] || []).length).length;
+  const completedLabel = `${completedStages}/${WORLD_CUP_STAGES.length} result categories recorded`;
+
+  return `
+    <div class="world-cup-archive-hero">
+      <div>
+        <span class="mini-label">${WORLD_CUP_ARCHIVE_LABEL}</span>
+        <h3>Challenge entries are closed</h3>
+        <p>This page now serves as the permanent public archive for the BAFSL World Cup 2026 Bracket Challenge.</p>
+      </div>
+      <div class="world-cup-archive-champion">
+        <span>Champion</span>
+        <strong>${escapeAttr(champion)}</strong>
+      </div>
+    </div>
+
+    <div class="world-cup-archive-grid">
+      <a class="world-cup-archive-card" href="#world-cup" data-world-cup-jump="leaderboard">
+        <span>Final standings</span>
+        <strong>Leaderboard</strong>
+        <small>Ranked by total points with earliest submission as the tie-breaker.</small>
+      </a>
+      <a class="world-cup-archive-card" href="samples/bafsl-world-cup-prediction-sample.pdf">
+        <span>PDF record</span>
+        <strong>Sample Download</strong>
+        <small>Shows the branded PDF format participants received.</small>
+      </a>
+      <div class="world-cup-archive-card">
+        <span>Recorded results</span>
+        <strong>${completedLabel}</strong>
+        <small>Admin-entered results are preserved for leaderboard scoring.</small>
+      </div>
+    </div>
+
+    <section class="world-cup-pick-stage">
+      <div class="world-cup-stage-heading">
+        <div><span class="mini-label">Archive record</span><h3>Actual Results Used For Scoring</h3></div>
+        <p>Participant names and scores are public. Emails and full brackets remain admin-only.</p>
+      </div>
+      <div class="world-cup-result-archive">
+        ${WORLD_CUP_STAGES.map((stage) => {
+          const teams = worldCupResults[stage.id] || [];
+          return `
+            <div class="world-cup-result-card">
+              <strong>${stage.label}</strong>
+              <span>${teams.length}/${stage.count} recorded</span>
+              <p>${teams.length ? teams.map(escapeAttr).join(", ") : "No archived result recorded yet."}</p>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -428,7 +494,7 @@ function normalizeWorldCupIdentity(value) {
 }
 
 async function submitWorldCupPrediction(name, email, picks) {
-  if (new Date() >= WORLD_CUP_ENTRY_DEADLINE) {
+  if (WORLD_CUP_ARCHIVED || new Date() >= WORLD_CUP_ENTRY_DEADLINE) {
     throw new Error("World Cup bracket entries are closed.");
   }
 
@@ -629,7 +695,7 @@ async function loadWorldCupLeaderboard() {
         <div><strong>${escapeAttr(entry.name)}</strong><span>Bracket submitted ${new Date(entry.submitted_at).toLocaleDateString()}</span></div>
         <strong class="world-cup-score">${entry.score} pts</strong>
       </div>
-    `).join("") : `<p class="rank-meta">No brackets yet. Be the first to enter.</p>`;
+    `).join("") : `<p class="rank-meta">No archived brackets are available yet.</p>`;
   } catch {
     worldCupEls.leaderboard.innerHTML = `<p class="rank-meta">The leaderboard will appear after the World Cup database update is installed.</p>`;
   }
@@ -792,6 +858,7 @@ async function loadWorldCupRemoteResults() {
     }, {});
     worldCupResults = WorldCupScoring.trimInvalidResults(worldCupResults, WORLD_CUP_STAGES, allWorldCupTeams());
     saveWorldCupLocalResults();
+    renderWorldCupBracket();
     renderWorldCupAdminStage();
   } catch {
     // Local results remain available when the World Cup tables are not installed yet.
@@ -813,10 +880,18 @@ worldCupEls.toggle.addEventListener("click", () => {
 });
 worldCupEls.share.addEventListener("click", shareWorldCupChallenge);
 document.addEventListener("click", (event) => {
+  const archiveJump = event.target.closest("[data-world-cup-jump]");
+  if (archiveJump) {
+    event.preventDefault();
+    const button = document.querySelector(`[data-world-cup-view="${archiveJump.dataset.worldCupJump}"]`);
+    button?.click();
+    return;
+  }
   if (event.target.closest('a[href="#world-cup"]')) setWorldCupChallengeOpen(false);
 });
 
 worldCupEls.bracket.addEventListener("change", (event) => {
+  if (WORLD_CUP_ARCHIVED) return;
   const groupSelect = event.target.closest("[data-world-cup-group]");
   if (groupSelect) {
     updateGroupPick(groupSelect);
@@ -828,6 +903,10 @@ worldCupEls.bracket.addEventListener("change", (event) => {
 
 worldCupEls.form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (WORLD_CUP_ARCHIVED) {
+    worldCupEls.message.textContent = "World Cup bracket entries are closed. This challenge is now archived.";
+    return;
+  }
   const validationMessage = validateWorldCupPicks();
   if (validationMessage) {
     worldCupEls.message.textContent = validationMessage;
@@ -851,7 +930,7 @@ worldCupEls.form.addEventListener("submit", async (event) => {
   } catch (error) {
     worldCupEls.message.textContent = error.message || "Your bracket could not be submitted. Please try again.";
   } finally {
-    submitButton.disabled = new Date() >= WORLD_CUP_ENTRY_DEADLINE;
+    submitButton.disabled = WORLD_CUP_ARCHIVED || new Date() >= WORLD_CUP_ENTRY_DEADLINE;
   }
 });
 
@@ -875,9 +954,9 @@ document.addEventListener("bafsl-admin-login", loadWorldCupAdminPredictions);
 worldCupEls.resultTeams.addEventListener("change", (event) => {
   const stage = worldCupStage(worldCupEls.resultStage.value);
   if (event.target.checked && ["group_winners", "group_runners_up"].includes(stage.id)) {
-    const selectedGroup = worldCupTeamGroup(event.target.value);
+    const selectedGroup = worldCupGroupForTeam(event.target.value);
     const groupAlreadySelected = [...worldCupEls.resultTeams.querySelectorAll("input:checked")]
-      .some((input) => input !== event.target && worldCupTeamGroup(input.value) === selectedGroup);
+      .some((input) => input !== event.target && worldCupGroupForTeam(input.value) === selectedGroup);
     if (groupAlreadySelected) {
       event.target.checked = false;
       els.adminMessage.textContent = `Only one ${stage.label.toLowerCase().replace(/s$/, "")} can be selected from Group ${selectedGroup}.`;
@@ -905,6 +984,7 @@ worldCupEls.resultForm.addEventListener("submit", async (event) => {
     els.adminMessage.textContent = "Results saved locally, but the live update failed.";
   }
   renderWorldCupAdminStage();
+  renderWorldCupBracket();
   loadWorldCupLeaderboard();
 });
 
@@ -918,7 +998,7 @@ if (new URLSearchParams(window.location.search).get("challenge") === "world-cup"
   setWorldCupChallengeOpen(true);
 }
 
-if (new Date() >= WORLD_CUP_ENTRY_DEADLINE) {
+if (WORLD_CUP_ARCHIVED || new Date() >= WORLD_CUP_ENTRY_DEADLINE) {
   worldCupEls.form.querySelector('button[type="submit"]').disabled = true;
-  worldCupEls.message.textContent = "World Cup bracket entries are closed.";
+  worldCupEls.message.textContent = "World Cup bracket entries are closed. This challenge is now archived.";
 }

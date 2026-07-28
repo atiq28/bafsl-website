@@ -80,80 +80,6 @@
 
       <section class="content-shell team-page is-hidden" id="teamPage"></section>
 
-      <section class="content-shell world-cup-section" id="world-cup">
-        <div class="world-cup-teaser">
-          <div>
-            <span class="mini-label">BAFSL Bracket Challenge</span>
-            <h2>World Cup 2026 Bracket Challenge</h2>
-            <p>Make your predictions, keep a branded PDF, and compete on the live leaderboard.</p>
-          </div>
-          <div class="world-cup-teaser-actions">
-            <button class="primary-action" id="worldCupToggle" type="button" aria-expanded="false" aria-controls="worldCupChallengeDetails">Open Challenge</button>
-            <button class="secondary-action" id="worldCupShare" type="button">Share Challenge</button>
-          </div>
-        </div>
-
-        <div class="world-cup-challenge-details is-hidden" id="worldCupChallengeDetails">
-          <div class="world-cup-intro">
-            <div>
-              <span class="mini-label">Build your path to the final</span>
-              <h2>Pick The World Cup 2026</h2>
-              <p>Predict every team that advances from the group stage through the final. Earn more points as your picks go deeper into the tournament.</p>
-            </div>
-            <div class="world-cup-countdown">
-              <strong id="worldCupEntryCount">0</strong>
-              <span>brackets entered</span>
-            </div>
-          </div>
-
-          <div class="world-cup-tabs" role="tablist" aria-label="World Cup challenge">
-            <button class="world-cup-tab is-active" type="button" data-world-cup-view="bracket">Make Picks</button>
-            <button class="world-cup-tab" type="button" data-world-cup-view="leaderboard">Leaderboard</button>
-            <button class="world-cup-tab" type="button" data-world-cup-view="rules">Scoring</button>
-          </div>
-
-          <section class="world-cup-view" data-world-cup-panel="bracket">
-            <form id="worldCupPredictionForm">
-              <div class="world-cup-step" id="worldCupBracket"></div>
-              <div class="world-cup-entry">
-                <div class="form-row">
-                  <label>
-                    Your Name
-                    <input name="name" maxlength="80" autocomplete="name" required />
-                  </label>
-                  <label>
-                    Email Address
-                    <input name="email" type="email" maxlength="160" autocomplete="email" required />
-                  </label>
-                </div>
-                <label class="checkbox-row">
-                  <input name="consent" type="checkbox" required />
-                  I agree that my name can appear on the public leaderboard. My email stays private.
-                </label>
-                <button class="primary-action full" type="submit">Submit My Bracket</button>
-                <button class="secondary-form-action full is-hidden" id="worldCupDownloadPdf" type="button">Download My Prediction PDF</button>
-                <p class="form-message" id="worldCupFormMessage" role="status"></p>
-              </div>
-            </form>
-          </section>
-
-          <section class="world-cup-view is-hidden" data-world-cup-panel="leaderboard">
-            <div class="world-cup-leaderboard-head">
-              <div>
-                <span class="mini-label">Live standings</span>
-                <h3>Prediction Leaderboard</h3>
-              </div>
-              <button class="secondary-form-action world-cup-refresh" id="worldCupRefresh" type="button">Refresh</button>
-            </div>
-            <div class="world-cup-leaderboard" id="worldCupLeaderboard"></div>
-          </section>
-
-          <section class="world-cup-view is-hidden" data-world-cup-panel="rules">
-            <div class="world-cup-rules" id="worldCupRules"></div>
-          </section>
-        </div>
-      </section>
-
       <section class="content-shell live-layout" id="fixtures">
         <aside class="sidebar">
           <div class="section-heading compact">
@@ -255,6 +181,80 @@
           <h2>News & Updates</h2>
         </div>
         <div class="news-grid" id="newsGrid"></div>
+      </section>
+
+      <section class="content-shell world-cup-section" id="world-cup">
+        <div class="world-cup-teaser">
+          <div>
+            <span class="mini-label">BAFSL Bracket Challenge Archive</span>
+            <h2>World Cup 2026 Bracket Challenge</h2>
+            <p>The challenge is complete. View the final leaderboard, scoring rules, and archived tournament results.</p>
+          </div>
+          <div class="world-cup-teaser-actions">
+            <button class="primary-action" id="worldCupToggle" type="button" aria-expanded="false" aria-controls="worldCupChallengeDetails">View Archive</button>
+            <button class="secondary-action" id="worldCupShare" type="button">Share Archive</button>
+          </div>
+        </div>
+
+        <div class="world-cup-challenge-details is-hidden" id="worldCupChallengeDetails">
+          <div class="world-cup-intro">
+            <div>
+              <span class="mini-label">Completed challenge</span>
+              <h2>World Cup 2026 Archive</h2>
+              <p>The BAFSL bracket challenge is preserved here with the leaderboard, scoring system, sample PDF, and recorded tournament results.</p>
+            </div>
+            <div class="world-cup-countdown">
+              <strong id="worldCupEntryCount">0</strong>
+              <span>brackets entered</span>
+            </div>
+          </div>
+
+          <div class="world-cup-tabs" role="tablist" aria-label="World Cup challenge">
+            <button class="world-cup-tab is-active" type="button" data-world-cup-view="bracket">Archive</button>
+            <button class="world-cup-tab" type="button" data-world-cup-view="leaderboard">Leaderboard</button>
+            <button class="world-cup-tab" type="button" data-world-cup-view="rules">Scoring</button>
+          </div>
+
+          <section class="world-cup-view" data-world-cup-panel="bracket">
+            <form id="worldCupPredictionForm">
+              <div class="world-cup-step" id="worldCupBracket"></div>
+              <div class="world-cup-entry">
+                <div class="form-row">
+                  <label>
+                    Your Name
+                    <input name="name" maxlength="80" autocomplete="name" required />
+                  </label>
+                  <label>
+                    Email Address
+                    <input name="email" type="email" maxlength="160" autocomplete="email" required />
+                  </label>
+                </div>
+                <label class="checkbox-row">
+                  <input name="consent" type="checkbox" required />
+                  I agree that my name can appear on the public leaderboard. My email stays private.
+                </label>
+                <button class="primary-action full" type="submit">Submit My Bracket</button>
+                <button class="secondary-form-action full is-hidden" id="worldCupDownloadPdf" type="button">Download My Prediction PDF</button>
+                <p class="form-message" id="worldCupFormMessage" role="status"></p>
+              </div>
+            </form>
+          </section>
+
+          <section class="world-cup-view is-hidden" data-world-cup-panel="leaderboard">
+            <div class="world-cup-leaderboard-head">
+              <div>
+                <span class="mini-label">Live standings</span>
+                <h3>Prediction Leaderboard</h3>
+              </div>
+              <button class="secondary-form-action world-cup-refresh" id="worldCupRefresh" type="button">Refresh</button>
+            </div>
+            <div class="world-cup-leaderboard" id="worldCupLeaderboard"></div>
+          </section>
+
+          <section class="world-cup-view is-hidden" data-world-cup-panel="rules">
+            <div class="world-cup-rules" id="worldCupRules"></div>
+          </section>
+        </div>
       </section>
 
       <section class="admin-strip">
