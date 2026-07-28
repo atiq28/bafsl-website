@@ -486,8 +486,26 @@ h1 {
 
 .amateur-roster-card ol {
   color: #263a34;
+  counter-reset: roster-player;
   font-size: 14px;
+  list-style: none;
   overflow-y: auto;
+  padding-left: 0;
+}
+
+.amateur-roster-card li {
+  align-items: start;
+  counter-increment: roster-player;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 26px minmax(0, 1fr);
+}
+
+.amateur-roster-card li::before {
+  color: #b87900;
+  content: counter(roster-player) ".";
+  font-weight: 950;
+  text-align: right;
 }
 
 .amateur-poster-grid {
