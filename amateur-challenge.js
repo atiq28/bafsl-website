@@ -73,37 +73,56 @@ function amateurScore(record, matchId) {
 }
 
 function renderAmateurPublicScores() {
-  document.querySelectorAll("[data-amateur-public-match]").forEach((card) => {
-    const matchId = Number(card.dataset.amateurPublicMatch);
-    const match = AMATEUR_GROUP_MATCHES.find((item) => item.id === matchId);
-    const result = amateurMatchResults[String(matchId)];
+  const root = document.querySelector("#amateurPublicMatchList");
+  if (!root) return;
+  root.innerHTML = AMATEUR_GROUP_MATCHES.map((match) => {
+    const result = amateurMatchResults[String(match.id)];
     const score = result && result.homeScore !== null && result.awayScore !== null
       ? { home: result.homeScore, away: result.awayScore }
       : null;
-    const title = card.querySelector("strong");
-    if (!match || !title) return;
+    const home = teamByAmateurId(match.home);
+    const away = teamByAmateurId(match.away);
+    const status = result?.status || "upcoming";
+    const events = result?.events || [];
+    const scoreText = score ? `${score.home} - ${score.away}` : "vs";
+    const scoreMarkup = events.length
+      ? `<button class="score-toggle" type="button" data-amateur-match-toggle="${match.id}" aria-expanded="false" aria-controls="amateur-events-${match.id}">${scoreText}</button>`
+      : `<span>${scoreText}</span>`;
+    let homeGoals = 0;
+    let awayGoals = 0;
+    const eventRows = events.map((item) => {
+      const isHome = item.team === match.home;
+      const isGoal = item.type === "goal";
+      if (isGoal && isHome) homeGoals += 1;
+      if (isGoal && !isHome) awayGoals += 1;
+      const icon = isGoal
+        ? `<span class="event-ball" aria-label="Goal"></span>`
+        : `<span class="card-icon ${item.type === "red" ? "red" : "yellow"}" aria-label="${item.type === "red" ? "Red" : "Yellow"} card"></span>`;
+      const names = `<span class="event-names"><span class="event-player">${escapeAttr(item.player)}</span>${item.assist ? `<span class="assist-name">${escapeAttr(item.assist)}</span>` : ""}</span>`;
+      const detail = `<div class="event-detail ${isHome ? "home" : "away"}">${isHome ? `${names}${icon}` : `${icon}${names}`}</div>`;
+      return `<div class="event-row"><div>${isHome ? detail : ""}</div><div class="event-score">${isGoal ? `<strong>${homeGoals} - ${awayGoals}</strong>` : ""}</div><div>${isHome ? "" : detail}</div></div>`;
+    }).join("");
 
-    const home = teamByAmateurId(match.home).name;
-    const away = teamByAmateurId(match.away).name;
-    title.textContent = score
-      ? `Game ${match.id}: ${home} ${score.home} - ${score.away} ${away}`
-      : `Game ${match.id}: ${home} vs ${away}`;
-    card.classList.toggle("has-result", Boolean(score));
-
-    card.querySelector(".amateur-match-result-details")?.remove();
-    if (!result || result.status === "upcoming") return;
-    const details = document.createElement("div");
-    details.className = "amateur-match-result-details";
-    details.innerHTML = `
-      <span class="status-pill status-${escapeAttr(result.status)}">${escapeAttr(result.status)}</span>
-      ${(result.events || []).map((item) => {
-        const icon = item.type === "goal" ? "⚽" : item.type === "red" ? "🟥" : "🟨";
-        const assist = item.assist ? ` <small>Assist: ${escapeAttr(item.assist)}</small>` : "";
-        return `<div class="amateur-result-event"><span>${icon}</span><strong>${escapeAttr(item.player)}</strong><span>${escapeAttr(teamByAmateurId(item.team).name)}</span>${assist}</div>`;
-      }).join("")}
+    return `
+      <article class="match-card amateur-league-match-card">
+        <div class="match-meta">
+          <strong>Game ${match.id} · ${escapeAttr(match.date)}</strong><br />
+          ${escapeAttr(match.time)}<br />${escapeAttr(match.venue)}
+          <span class="status-pill status-${escapeAttr(status)}">${escapeAttr(status)}</span>
+        </div>
+        <div class="team-side">
+          <span class="crest"><img src="${escapeAttr(home.logo)}" alt="${escapeAttr(home.name)} logo" /></span>
+          <strong>${escapeAttr(home.name)}</strong>
+        </div>
+        <div class="scoreline">${scoreMarkup}</div>
+        <div class="team-side away">
+          <strong>${escapeAttr(away.name)}</strong>
+          <span class="crest"><img src="${escapeAttr(away.logo)}" alt="${escapeAttr(away.name)} logo" /></span>
+        </div>
+        ${eventRows ? `<div class="match-events" id="amateur-events-${match.id}" hidden>${eventRows}</div>` : ""}
+      </article>
     `;
-    card.append(details);
-  });
+  }).join("");
 }
 
 function setAmateurChallengeOpen(open, options = {}) {
@@ -739,6 +758,15 @@ function initAmateurChallenge() {
   amateurEls.adminRefresh.addEventListener("click", loadAmateurAdminPredictions);
   amateurEls.predictionSelect.addEventListener("change", renderAmateurAdminPrediction);
   amateurEls.deletePrediction.addEventListener("click", deleteAmateurPrediction);
+  document.querySelector("#amateurPublicMatchList")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-amateur-match-toggle]");
+    if (!button) return;
+    const panel = document.querySelector(`#amateur-events-${button.dataset.amateurMatchToggle}`);
+    if (!panel) return;
+    const open = button.getAttribute("aria-expanded") === "true";
+    button.setAttribute("aria-expanded", String(!open));
+    panel.hidden = open;
+  });
   amateurEls.matchResultSelect.innerHTML = AMATEUR_GROUP_MATCHES.map((match) => `<option value="${match.id}">Game ${match.id}: ${escapeAttr(teamByAmateurId(match.home).name)} vs ${escapeAttr(teamByAmateurId(match.away).name)}</option>`).join("");
   amateurEls.matchResultSelect.addEventListener("change", populateAmateurMatchResultForm);
   amateurEls.matchResultForm.elements.status.addEventListener("change", () => {

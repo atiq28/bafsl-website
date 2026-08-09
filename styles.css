@@ -395,6 +395,19 @@ h1 {
   grid-template-columns: 1.45fr 1fr 1fr;
 }
 
+.amateur-schedule-card.is-group {
+  grid-column: 1 / -1;
+}
+
+.amateur-public-match-list {
+  display: grid;
+  gap: 10px;
+}
+
+.amateur-league-match-card {
+  background: white;
+}
+
 .amateur-schedule-card,
 .amateur-guide-card,
 .amateur-roster-card {
