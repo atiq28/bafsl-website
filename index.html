@@ -127,27 +127,27 @@
         <div class="amateur-schedule-grid">
           <article class="amateur-schedule-card is-group">
             <h3>Group Stage Games</h3>
-            <div class="amateur-match">
+            <div class="amateur-match" data-amateur-public-match="1">
               <span>Day 1 - Aug 8</span>
               <strong>Game 1: Nandonik (A) vs Ekattor FC (B)</strong>
               <small>6:30pm - 8:10pm at FO</small>
             </div>
-            <div class="amateur-match">
+            <div class="amateur-match" data-amateur-public-match="2">
               <span>Day 1 - Aug 8</span>
               <strong>Game 2: Joddha (C) vs Sonar Bangla (D)</strong>
               <small>8:15pm - 10:00pm at FO</small>
             </div>
-            <div class="amateur-match">
+            <div class="amateur-match" data-amateur-public-match="3">
               <span>Day 2 - Aug 9</span>
               <strong>Game 3: Ekattor FC (B) vs Joddha (C)</strong>
               <small>6:30pm - 8:10pm at Shoreline</small>
             </div>
-            <div class="amateur-match">
+            <div class="amateur-match" data-amateur-public-match="4">
               <span>Day 2 - Aug 9</span>
               <strong>Game 4: Sonar Bangla (D) vs Dhumketu (E)</strong>
               <small>8:15pm - 10:00pm at Shoreline</small>
             </div>
-            <div class="amateur-match">
+            <div class="amateur-match" data-amateur-public-match="5">
               <span>Day 3 - Aug 15</span>
               <strong>Game 5: Dhumketu (E) vs Nandonik (A)</strong>
               <small>7:00am - 9:00am at FO / Shoreline / Crittenden</small>
@@ -658,8 +658,37 @@
           </div>
 
           <div class="world-cup-admin-results">
+            <span class="mini-label">Amateur match center</span>
+            <h3>Group Stage Game Results</h3>
+          </div>
+          <form id="amateurMatchResultForm" class="admin-form">
+            <label>
+              Match
+              <select name="matchId" id="amateurMatchResultSelect"></select>
+            </label>
+            <div class="form-row">
+              <label>Home Score<input name="homeScore" type="number" min="0" /></label>
+              <label>Away Score<input name="awayScore" type="number" min="0" /></label>
+            </div>
+            <label>
+              Status
+              <select name="status">
+                <option value="upcoming">Upcoming</option>
+                <option value="live">Live</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
+            <label>
+              Goals, Assists & Cards
+              <textarea name="events" rows="6" placeholder="One event per line: Type, Team, Player, Assist&#10;Examples:&#10;goal, Nandonik, Samuel, Atiq Islam&#10;yellow, Ekattor FC, Player Name&#10;red, Joddha, Player Name"></textarea>
+            </label>
+            <button class="primary-action full" type="submit">Update Group Match</button>
+          </form>
+          <p class="admin-hint">Use goal, yellow, or red followed by team and player. Add the assist as the fourth value for goals.</p>
+
+          <div class="world-cup-admin-results">
             <span class="mini-label">Tournament progress</span>
-            <h3>Actual Results</h3>
+            <h3>Bracket Challenge Results</h3>
           </div>
           <form id="worldCupResultForm" class="admin-form">
             <label>

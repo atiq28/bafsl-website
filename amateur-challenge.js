@@ -1,6 +1,7 @@
 const AMATEUR_LOCAL_PREDICTIONS = "bafsl-amateur-2026-predictions-v1";
 const AMATEUR_LOCAL_RESULTS = "bafsl-amateur-2026-results-v1";
-const AMATEUR_ENTRY_DEADLINE = new Date("2026-08-08T18:00:00-07:00");
+const AMATEUR_LOCAL_MATCH_RESULTS = "bafsl-amateur-2026-match-results-v1";
+const AMATEUR_ENTRIES_OPEN = false;
 
 const AMATEUR_TEAMS = [
   { id: "nandonik", name: "Nandonik", owner: "Tonmoy", logo: "assets/amateur-2026/logo-nandonik.png" },
@@ -33,6 +34,7 @@ const amateurPicks = {
   totalGoals: ""
 };
 let amateurResults = loadAmateurLocalResults();
+let amateurMatchResults = loadAmateurLocalMatchResults();
 let amateurAdminPredictions = [];
 let lastSubmittedAmateurPrediction = null;
 
@@ -55,7 +57,9 @@ const amateurEls = {
   adminRefresh: document.querySelector("#amateurAdminRefresh"),
   predictionSelect: document.querySelector("#amateurPredictionSelect"),
   predictionDetail: document.querySelector("#amateurPredictionDetail"),
-  deletePrediction: document.querySelector("#amateurDeletePrediction")
+  deletePrediction: document.querySelector("#amateurDeletePrediction"),
+  matchResultForm: document.querySelector("#amateurMatchResultForm"),
+  matchResultSelect: document.querySelector("#amateurMatchResultSelect")
 };
 
 if (amateurEls.challenge) initAmateurChallenge();
@@ -66,6 +70,40 @@ function teamByAmateurId(id) {
 
 function amateurScore(record, matchId) {
   return AmateurChallengeScoring.matchScore(record, matchId);
+}
+
+function renderAmateurPublicScores() {
+  document.querySelectorAll("[data-amateur-public-match]").forEach((card) => {
+    const matchId = Number(card.dataset.amateurPublicMatch);
+    const match = AMATEUR_GROUP_MATCHES.find((item) => item.id === matchId);
+    const result = amateurMatchResults[String(matchId)];
+    const score = result && result.homeScore !== null && result.awayScore !== null
+      ? { home: result.homeScore, away: result.awayScore }
+      : null;
+    const title = card.querySelector("strong");
+    if (!match || !title) return;
+
+    const home = teamByAmateurId(match.home).name;
+    const away = teamByAmateurId(match.away).name;
+    title.textContent = score
+      ? `Game ${match.id}: ${home} ${score.home} - ${score.away} ${away}`
+      : `Game ${match.id}: ${home} vs ${away}`;
+    card.classList.toggle("has-result", Boolean(score));
+
+    card.querySelector(".amateur-match-result-details")?.remove();
+    if (!result || result.status === "upcoming") return;
+    const details = document.createElement("div");
+    details.className = "amateur-match-result-details";
+    details.innerHTML = `
+      <span class="status-pill status-${escapeAttr(result.status)}">${escapeAttr(result.status)}</span>
+      ${(result.events || []).map((item) => {
+        const icon = item.type === "goal" ? "⚽" : item.type === "red" ? "🟥" : "🟨";
+        const assist = item.assist ? ` <small>Assist: ${escapeAttr(item.assist)}</small>` : "";
+        return `<div class="amateur-result-event"><span>${icon}</span><strong>${escapeAttr(item.player)}</strong><span>${escapeAttr(teamByAmateurId(item.team).name)}</span>${assist}</div>`;
+      }).join("")}
+    `;
+    card.append(details);
+  });
 }
 
 function setAmateurChallengeOpen(open, options = {}) {
@@ -112,6 +150,42 @@ function loadAmateurLocalResults() {
   } catch {
     return { scores: {}, groupRanking: [] };
   }
+}
+
+function loadAmateurLocalMatchResults() {
+  try {
+    return JSON.parse(localStorage.getItem(AMATEUR_LOCAL_MATCH_RESULTS)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveAmateurLocalMatchResults() {
+  localStorage.setItem(AMATEUR_LOCAL_MATCH_RESULTS, JSON.stringify(amateurMatchResults));
+}
+
+function parseAmateurMatchEvents(value) {
+  return String(value || "").split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+    const parts = line.split(",").map((part) => part.trim());
+    const type = String(parts[0] || "").toLowerCase();
+    const teamName = String(parts[1] || "").toLowerCase();
+    const team = AMATEUR_TEAMS.find((item) => item.id === teamName || item.name.toLowerCase() === teamName);
+    if (!["goal", "yellow", "red"].includes(type) || !team || !parts[2]) return null;
+    return { type, team: team.id, player: parts[2], assist: type === "goal" ? (parts[3] || "") : "" };
+  }).filter(Boolean);
+}
+
+function amateurMatchEventsToText(events = []) {
+  return events.map((item) => `${item.type}, ${teamByAmateurId(item.team).name}, ${item.player}${item.assist ? `, ${item.assist}` : ""}`).join("\n");
+}
+
+function populateAmateurMatchResultForm() {
+  const matchId = amateurEls.matchResultSelect.value;
+  const result = amateurMatchResults[matchId] || { homeScore: null, awayScore: null, status: "upcoming", events: [] };
+  amateurEls.matchResultForm.elements.homeScore.value = result.homeScore ?? "";
+  amateurEls.matchResultForm.elements.awayScore.value = result.awayScore ?? "";
+  amateurEls.matchResultForm.elements.status.value = result.status || "upcoming";
+  amateurEls.matchResultForm.elements.events.value = amateurMatchEventsToText(result.events);
 }
 
 function saveAmateurLocalResults() {
@@ -339,7 +413,7 @@ function submissionAmateurPicks() {
 }
 
 async function submitAmateurPrediction(name, email, picks) {
-  if (new Date() >= AMATEUR_ENTRY_DEADLINE) throw new Error("Amateur challenge entries are closed.");
+  if (!AMATEUR_ENTRIES_OPEN) throw new Error("Amateur challenge entries are closed.");
 
   const saveLocal = () => {
     const predictions = loadAmateurLocalPredictions();
@@ -617,11 +691,43 @@ async function loadAmateurRemoteResults() {
     if (rows[0]?.data) {
       amateurResults = rows[0].data;
       saveAmateurLocalResults();
+      renderAmateurPublicScores();
       renderAmateurResultInputs();
       loadAmateurLeaderboard();
     }
   } catch {
     // Local results remain available until Supabase is updated.
+  }
+}
+
+async function saveAmateurRemoteMatchResult(matchId, result) {
+  if (!remoteConfigured() || !remoteAccessToken) return false;
+  const response = await fetch(`${REMOTE_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/amateur_match_results`, {
+    method: "POST",
+    headers: remoteHeaders({ Authorization: `Bearer ${remoteAccessToken}`, Prefer: "resolution=merge-duplicates,return=minimal" }),
+    body: JSON.stringify({ match_id: Number(matchId), ...result })
+  });
+  if (!response.ok) throw new Error("Amateur match result could not be saved.");
+  return true;
+}
+
+async function loadAmateurRemoteMatchResults() {
+  if (!remoteConfigured()) return;
+  try {
+    const response = await fetch(`${REMOTE_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/amateur_match_results?select=match_id,home_score,away_score,status,events`, { headers: remoteHeaders() });
+    if (!response.ok) return;
+    const rows = await response.json();
+    amateurMatchResults = Object.fromEntries(rows.map((row) => [String(row.match_id), {
+      homeScore: row.home_score,
+      awayScore: row.away_score,
+      status: row.status,
+      events: row.events || []
+    }]));
+    saveAmateurLocalMatchResults();
+    renderAmateurPublicScores();
+    populateAmateurMatchResultForm();
+  } catch {
+    // Keep locally cached match details available if the live service is unavailable.
   }
 }
 
@@ -633,6 +739,42 @@ function initAmateurChallenge() {
   amateurEls.adminRefresh.addEventListener("click", loadAmateurAdminPredictions);
   amateurEls.predictionSelect.addEventListener("change", renderAmateurAdminPrediction);
   amateurEls.deletePrediction.addEventListener("click", deleteAmateurPrediction);
+  amateurEls.matchResultSelect.innerHTML = AMATEUR_GROUP_MATCHES.map((match) => `<option value="${match.id}">Game ${match.id}: ${escapeAttr(teamByAmateurId(match.home).name)} vs ${escapeAttr(teamByAmateurId(match.away).name)}</option>`).join("");
+  amateurEls.matchResultSelect.addEventListener("change", populateAmateurMatchResultForm);
+  amateurEls.matchResultForm.elements.status.addEventListener("change", () => {
+    if (amateurEls.matchResultForm.elements.status.value !== "upcoming") return;
+    amateurEls.matchResultForm.elements.homeScore.value = "";
+    amateurEls.matchResultForm.elements.awayScore.value = "";
+    amateurEls.matchResultForm.elements.events.value = "";
+  });
+  amateurEls.matchResultForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const matchId = String(form.get("matchId"));
+    const status = String(form.get("status"));
+    const result = status === "upcoming"
+      ? { homeScore: null, awayScore: null, status, events: [] }
+      : {
+          homeScore: form.get("homeScore") === "" ? 0 : Number(form.get("homeScore")),
+          awayScore: form.get("awayScore") === "" ? 0 : Number(form.get("awayScore")),
+          status,
+          events: parseAmateurMatchEvents(form.get("events"))
+        };
+    amateurMatchResults[matchId] = result;
+    saveAmateurLocalMatchResults();
+    renderAmateurPublicScores();
+    try {
+      const synced = await saveAmateurRemoteMatchResult(matchId, {
+        home_score: result.homeScore,
+        away_score: result.awayScore,
+        status: result.status,
+        events: result.events
+      });
+      els.adminMessage.textContent = synced ? "Amateur score and match details updated." : "Amateur match saved in this browser. Sign in to sync it live.";
+    } catch {
+      els.adminMessage.textContent = "Amateur match saved locally, but the live update failed.";
+    }
+  });
 
   amateurEls.details.querySelector(".world-cup-tabs")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-amateur-view]");
@@ -698,7 +840,7 @@ function initAmateurChallenge() {
     } catch (error) {
       amateurEls.message.textContent = error.message || "Your prediction could not be submitted. Please try again.";
     } finally {
-      submitButton.disabled = new Date() >= AMATEUR_ENTRY_DEADLINE;
+      submitButton.disabled = !AMATEUR_ENTRIES_OPEN;
     }
   });
 
@@ -741,6 +883,7 @@ function initAmateurChallenge() {
     } catch {
       els.adminMessage.textContent = "Results saved locally, but the live update failed.";
     }
+    renderAmateurPublicScores();
     renderAmateurResultInputs();
     loadAmateurLeaderboard();
   });
@@ -751,15 +894,17 @@ function initAmateurChallenge() {
   document.addEventListener("bafsl-admin-login", loadAmateurAdminPredictions);
 
   renderAmateurBracket();
+  renderAmateurPublicScores();
+  populateAmateurMatchResultForm();
   renderAmateurRules();
   renderAmateurResultInputs();
   loadAmateurRemoteResults();
+  loadAmateurRemoteMatchResults();
   loadAmateurLeaderboard();
   if (new URLSearchParams(window.location.search).get("challenge") === "amateur-2026") {
     setAmateurChallengeOpen(true, { scroll: true });
   }
-  if (new Date() >= AMATEUR_ENTRY_DEADLINE) {
-    amateurEls.form.querySelector('button[type="submit"]').disabled = true;
-    amateurEls.message.textContent = "Amateur challenge entries are closed.";
-  }
+  const submitButton = amateurEls.form.querySelector('button[type="submit"]');
+  submitButton.disabled = !AMATEUR_ENTRIES_OPEN;
+  if (!AMATEUR_ENTRIES_OPEN) amateurEls.message.textContent = "Amateur challenge entries are closed. Existing entries remain on the leaderboard.";
 }

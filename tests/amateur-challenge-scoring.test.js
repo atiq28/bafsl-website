@@ -79,6 +79,9 @@ test("supabase script includes amateur challenge storage, submission, and leader
 
   assert.match(sql, /create table if not exists public\.amateur_predictions/);
   assert.match(sql, /create table if not exists public\.amateur_results/);
+  assert.match(sql, /create table if not exists public\.amateur_match_results/);
+  assert.match(sql, /Public can read Amateur match results/);
+  assert.match(sql, /Admins can manage Amateur match results/);
   assert.match(sql, /submit_amateur_prediction/);
   assert.match(sql, /amateur_prediction_score/);
   assert.match(sql, /create or replace view public\.amateur_leaderboard/);

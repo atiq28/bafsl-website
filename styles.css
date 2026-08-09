@@ -433,6 +433,30 @@ h1 {
   margin: 4px 0;
 }
 
+.amateur-match-result-details {
+  border-top: 1px dashed var(--line);
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.amateur-result-event {
+  align-items: center;
+  display: grid;
+  font-size: 13px;
+  gap: 8px;
+  grid-template-columns: auto 1fr auto;
+}
+
+.amateur-result-event strong {
+  margin: 0;
+}
+
+.amateur-result-event small {
+  grid-column: 2 / -1;
+}
+
 .amateur-note {
   background: #fff7df;
   border: 1px solid #f4d982;

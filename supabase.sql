@@ -192,8 +192,26 @@ create table if not exists public.amateur_results (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.amateur_match_results (
+  match_id integer primary key check (match_id between 1 and 5),
+  home_score integer check (home_score >= 0),
+  away_score integer check (away_score >= 0),
+  status text not null default 'upcoming' check (status in ('upcoming', 'live', 'completed')),
+  events jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
 alter table public.amateur_predictions enable row level security;
 alter table public.amateur_results enable row level security;
+alter table public.amateur_match_results enable row level security;
+
+drop policy if exists "Public can read Amateur match results" on public.amateur_match_results;
+create policy "Public can read Amateur match results"
+on public.amateur_match_results for select to anon, authenticated using (true);
+
+drop policy if exists "Admins can manage Amateur match results" on public.amateur_match_results;
+create policy "Admins can manage Amateur match results"
+on public.amateur_match_results for all to authenticated using (true) with check (true);
 
 drop policy if exists "Admins can read Amateur predictions" on public.amateur_predictions;
 create policy "Admins can read Amateur predictions"
@@ -237,9 +255,7 @@ as $$
 declare
   new_id uuid;
 begin
-  if now() >= timestamptz '2026-08-08 18:00:00-07' then
-    raise exception 'Amateur challenge entries are closed.';
-  end if;
+  raise exception 'Amateur challenge entries are closed.';
 
   if char_length(trim(participant_name)) not between 1 and 80 then
     raise exception 'Please provide a valid name.';
