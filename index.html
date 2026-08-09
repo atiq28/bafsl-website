@@ -658,6 +658,23 @@
           </div>
 
           <div class="world-cup-admin-results">
+            <span class="mini-label">Tournament progress</span>
+            <h3>Actual Results</h3>
+          </div>
+          <form id="worldCupResultForm" class="admin-form">
+            <label>
+              Result Category
+              <select name="stage" id="worldCupResultStage"></select>
+            </label>
+            <p class="admin-hint" id="worldCupResultHint"></p>
+            <div class="world-cup-admin-teams" id="worldCupResultTeams"></div>
+            <button class="primary-action full" type="submit">Save Actual Results</button>
+          </form>
+          <div class="world-cup-admin-summary" id="worldCupAdminSummary"></div>
+        </section>
+
+        <section class="admin-view is-hidden" data-view="amateur">
+          <div class="world-cup-admin-results">
             <span class="mini-label">Amateur match center</span>
             <h3>Group Stage Game Results</h3>
           </div>
@@ -686,23 +703,6 @@
           </form>
           <p class="admin-hint">Use goal, yellow, or red followed by team and player. Add the assist as the fourth value for goals.</p>
 
-          <div class="world-cup-admin-results">
-            <span class="mini-label">Tournament progress</span>
-            <h3>Bracket Challenge Results</h3>
-          </div>
-          <form id="worldCupResultForm" class="admin-form">
-            <label>
-              Result Category
-              <select name="stage" id="worldCupResultStage"></select>
-            </label>
-            <p class="admin-hint" id="worldCupResultHint"></p>
-            <div class="world-cup-admin-teams" id="worldCupResultTeams"></div>
-            <button class="primary-action full" type="submit">Save Actual Results</button>
-          </form>
-          <div class="world-cup-admin-summary" id="worldCupAdminSummary"></div>
-        </section>
-
-        <section class="admin-view is-hidden" data-view="amateur">
           <div class="world-cup-admin-predictions">
             <div class="world-cup-leaderboard-head">
               <div>
@@ -725,7 +725,7 @@
 
           <div class="world-cup-admin-results">
             <span class="mini-label">Tournament progress</span>
-            <h3>Actual Results</h3>
+            <h3>Bracket Challenge Results</h3>
           </div>
           <form id="amateurResultForm" class="admin-form">
             <div id="amateurResultInputs"></div>
