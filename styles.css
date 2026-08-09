@@ -408,6 +408,21 @@ h1 {
   background: white;
 }
 
+.amateur-group-stats {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.7fr) minmax(240px, 0.7fr);
+  margin-top: 14px;
+}
+
+.amateur-standings-card,
+.amateur-group-stats .leaderboard-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+}
+
 .amateur-schedule-card,
 .amateur-guide-card,
 .amateur-roster-card {
@@ -2271,6 +2286,7 @@ textarea {
   .news-grid,
   .blog-grid,
   .amateur-schedule-grid,
+  .amateur-group-stats,
   .amateur-guide-grid,
   .amateur-roster-grid,
   .team-detail-grid {

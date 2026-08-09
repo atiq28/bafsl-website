@@ -123,6 +123,91 @@ function renderAmateurPublicScores() {
       </article>
     `;
   }).join("");
+  renderAmateurGroupStats();
+}
+
+function completedAmateurGroupResults() {
+  return AMATEUR_GROUP_MATCHES.map((match) => ({ match, result: amateurMatchResults[String(match.id)] }))
+    .filter(({ result }) => result && result.status !== "upcoming" && result.homeScore !== null && result.awayScore !== null);
+}
+
+function amateurGroupStandings() {
+  const rows = AMATEUR_TEAMS.map((team) => ({ ...team, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0, fairPlay: 0 }));
+  const byId = Object.fromEntries(rows.map((team) => [team.id, team]));
+  const completed = completedAmateurGroupResults();
+  completed.forEach(({ match, result }) => {
+    const home = byId[match.home];
+    const away = byId[match.away];
+    home.played += 1;
+    away.played += 1;
+    home.gf += result.homeScore;
+    home.ga += result.awayScore;
+    away.gf += result.awayScore;
+    away.ga += result.homeScore;
+    if (result.homeScore > result.awayScore) {
+      home.won += 1; home.points += 3; away.lost += 1;
+    } else if (result.awayScore > result.homeScore) {
+      away.won += 1; away.points += 3; home.lost += 1;
+    } else {
+      home.drawn += 1; away.drawn += 1; home.points += 1; away.points += 1;
+    }
+    (result.events || []).forEach((item) => {
+      if (byId[item.team]) byId[item.team].fairPlay += item.type === "red" ? 3 : item.type === "yellow" ? 1 : 0;
+    });
+  });
+  rows.forEach((team) => { team.gd = team.gf - team.ga; });
+  return rows.sort((a, b) => {
+    const standard = b.points - a.points || b.gd - a.gd || b.gf - a.gf;
+    if (standard) return standard;
+    const headToHead = completed.find(({ match }) => [match.home, match.away].includes(a.id) && [match.home, match.away].includes(b.id));
+    if (headToHead) {
+      const { match, result } = headToHead;
+      const aGoals = match.home === a.id ? result.homeScore : result.awayScore;
+      const bGoals = match.home === b.id ? result.homeScore : result.awayScore;
+      if (aGoals !== bGoals) return bGoals - aGoals;
+    }
+    return a.ga - b.ga || a.fairPlay - b.fairPlay || a.name.localeCompare(b.name);
+  });
+}
+
+function amateurPlayerLeaderboard(field) {
+  const players = new Map();
+  completedAmateurGroupResults().forEach(({ result }) => {
+    (result.events || []).forEach((item) => {
+      const name = field === "goals" ? (item.type === "goal" ? item.player : "") : (item.type === "goal" ? item.assist : "");
+      if (!name) return;
+      const key = `${item.team}:${name.trim().toLowerCase()}`;
+      const current = players.get(key) || { name: name.trim(), team: item.team, total: 0 };
+      current.total += 1;
+      players.set(key, current);
+    });
+  });
+  return [...players.values()].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+}
+
+function renderAmateurPlayerList(target, rows, emptyText) {
+  if (!target) return;
+  target.innerHTML = rows.length ? rows.slice(0, 10).map((player, index) => `
+    <div class="rank-row">
+      <span class="rank-number">${index + 1}</span>
+      <div><strong>${escapeAttr(player.name)}</strong><div class="rank-meta">${escapeAttr(teamByAmateurId(player.team).name)}</div></div>
+      <span class="goals">${player.total}</span>
+    </div>
+  `).join("") : `<p class="rank-meta">${escapeAttr(emptyText)}</p>`;
+}
+
+function renderAmateurGroupStats() {
+  const body = document.querySelector("#amateurStandingsBody");
+  if (!body) return;
+  body.innerHTML = amateurGroupStandings().map((team) => `
+    <tr>
+      <td><div class="club-cell"><span class="crest"><img src="${escapeAttr(team.logo)}" alt="" /></span><strong>${escapeAttr(team.name)}</strong></div></td>
+      <td>${team.played}</td><td>${team.won}</td><td>${team.drawn}</td><td>${team.lost}</td>
+      <td>${team.gf}</td><td>${team.ga}</td><td>${team.gd}</td><td><strong>${team.points}</strong></td>
+    </tr>
+  `).join("");
+  renderAmateurPlayerList(document.querySelector("#amateurScorerList"), amateurPlayerLeaderboard("goals"), "No goals recorded yet.");
+  renderAmateurPlayerList(document.querySelector("#amateurAssistList"), amateurPlayerLeaderboard("assists"), "No assists recorded yet.");
 }
 
 function setAmateurChallengeOpen(open, options = {}) {
