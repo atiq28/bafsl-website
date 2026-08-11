@@ -486,6 +486,101 @@ h1 {
   width: 100%;
 }
 
+/* Compact sponsor banner */
+.amateur-sponsors {
+  margin: 16px 0;
+  padding: clamp(14px, 2vw, 20px);
+}
+
+.amateur-sponsors-heading h2 {
+  font-size: clamp(23px, 3vw, 34px);
+  margin: 5px 0 12px;
+}
+
+.sponsor-tier-label {
+  margin: 8px 0 7px;
+}
+
+.sponsor-premium-card {
+  display: flex;
+  justify-content: center;
+  min-height: 112px;
+  padding: 10px 24px;
+}
+
+.sponsor-premium-card img {
+  max-height: 90px;
+  max-width: 440px;
+}
+
+.sponsor-gold-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sponsor-logo-card {
+  display: flex;
+  justify-content: center;
+  min-height: 170px;
+  padding: 12px;
+}
+
+.sponsor-logo-card img {
+  max-height: 140px;
+}
+
+.sponsor-logo-card.nabic img {
+  padding: 5px;
+}
+
+.sponsor-profile-card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  min-height: 170px;
+  padding: 0;
+}
+
+.sponsor-profile-card img {
+  height: 170px;
+  object-fit: cover;
+  width: 92px;
+}
+
+.sponsor-profile-card.tasrina img {
+  object-position: 18% center;
+}
+
+.sponsor-profile-card.mohammad img {
+  object-position: center 38%;
+}
+
+.sponsor-profile-card span {
+  align-content: center;
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.sponsor-profile-card strong {
+  color: var(--field-dark);
+  font-size: clamp(15px, 1.5vw, 20px);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.sponsor-profile-card small,
+.sponsor-profile-card em {
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.sponsor-profile-card b {
+  color: var(--ink);
+  font-size: clamp(16px, 1.8vw, 22px);
+}
+
 .amateur-quick-card span,
 .amateur-quick-card small {
   display: block;
@@ -2487,13 +2582,15 @@ textarea {
   }
 
   .sponsor-premium-card {
-    gap: 20px;
-    grid-template-columns: minmax(180px, 1fr) 1px minmax(170px, 0.8fr);
+    min-height: 100px;
   }
 
   .sponsor-logo-card {
-    grid-template-columns: 1fr;
-    text-align: center;
+    min-height: 150px;
+  }
+
+  .sponsor-gold-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .world-cup-groups,
@@ -2586,9 +2683,12 @@ textarea {
 }
 
 @media (max-width: 560px) {
-  .sponsor-gold-grid,
   .sponsor-premium-card {
     grid-template-columns: 1fr;
+  }
+
+  .sponsor-gold-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sponsor-divider {
@@ -2601,14 +2701,22 @@ textarea {
     max-height: 125px;
   }
 
-  .sponsor-profile-card,
   .sponsor-profile-card img {
-    min-height: 0;
+    height: 92px;
+    width: 100%;
   }
 
-  .sponsor-profile-card img {
-    height: auto;
-    max-height: 440px;
+  .sponsor-profile-card {
+    grid-template-columns: 1fr;
+    min-height: 190px;
+  }
+
+  .sponsor-profile-card span {
+    padding: 9px;
+  }
+
+  .sponsor-profile-card em {
+    overflow-wrap: anywhere;
   }
 
   .site-header {
