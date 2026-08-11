@@ -587,6 +587,44 @@ h1 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+.sponsor-tier-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(250px, 0.9fr) minmax(0, 2.1fr);
+}
+
+.sponsor-tier-panel {
+  min-width: 0;
+}
+
+.sponsor-tier-panel h3 {
+  color: white;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  margin: 0 0 7px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sponsor-tier-panel.premium .sponsor-single-card {
+  height: 165px;
+}
+
+.sponsor-tier-panel.premium .sponsor-brand-card img {
+  height: 140px;
+  max-width: 390px;
+}
+
+.sponsor-gold-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sponsor-gold-row .sponsor-single-card {
+  min-height: 165px;
+}
+
 .sponsor-single-card {
   background: #fffdf8;
   border: 1px solid rgba(244, 183, 35, 0.7);
@@ -630,10 +668,10 @@ h1 {
 }
 
 .sponsor-brand-card.nabic img {
-  background: #063f32;
+  background: #fff0bd;
   border-radius: 7px;
   height: auto;
-  padding: 5px;
+  padding: 7px;
 }
 
 .sponsor-brand-card.zoober img {
@@ -676,6 +714,16 @@ h1 {
 }
 
 @media (max-width: 900px) {
+  .sponsor-tier-layout {
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 2.2fr);
+  }
+
+  .sponsor-gold-row {
+    grid-template-columns: repeat(4, minmax(155px, 1fr));
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
   .sponsor-single-row {
     grid-template-columns: repeat(5, minmax(170px, 1fr));
     overflow-x: auto;
@@ -2786,6 +2834,18 @@ textarea {
 }
 
 @media (max-width: 560px) {
+  .sponsor-tier-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sponsor-tier-panel.premium .sponsor-single-card {
+    height: 145px;
+  }
+
+  .sponsor-tier-panel.premium .sponsor-brand-card img {
+    height: 120px;
+  }
+
   .sponsor-premium-card {
     grid-template-columns: 1fr;
   }
