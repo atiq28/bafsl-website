@@ -489,12 +489,12 @@ h1 {
 /* Compact sponsor banner */
 .amateur-sponsors {
   margin: 16px 0;
-  padding: clamp(14px, 2vw, 20px);
+  padding: clamp(10px, 1.5vw, 16px);
 }
 
 .amateur-sponsors-heading h2 {
   font-size: clamp(23px, 3vw, 34px);
-  margin: 5px 0 12px;
+  margin: 4px 0 8px;
 }
 
 .sponsor-tier-label {
@@ -589,7 +589,7 @@ h1 {
 
 .sponsor-tier-layout {
   display: grid;
-  gap: 12px;
+  gap: 9px;
   grid-template-columns: minmax(250px, 0.9fr) minmax(0, 2.1fr);
 }
 
@@ -601,28 +601,28 @@ h1 {
   color: white;
   font-size: 12px;
   letter-spacing: 0.1em;
-  margin: 0 0 7px;
+  margin: 0 0 5px;
   text-align: center;
   text-transform: uppercase;
 }
 
 .sponsor-tier-panel.premium .sponsor-single-card {
-  height: 165px;
+  height: 132px;
 }
 
 .sponsor-tier-panel.premium .sponsor-brand-card img {
-  height: 140px;
+  height: 112px;
   max-width: 390px;
 }
 
 .sponsor-gold-row {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .sponsor-gold-row .sponsor-single-card {
-  min-height: 165px;
+  min-height: 132px;
 }
 
 .sponsor-single-card {
@@ -630,9 +630,9 @@ h1 {
   border: 1px solid rgba(244, 183, 35, 0.7);
   border-radius: 10px;
   color: var(--ink);
-  min-height: 155px;
+  min-height: 132px;
   overflow: hidden;
-  padding: 12px;
+  padding: 8px;
   position: relative;
   text-decoration: none;
 }
@@ -651,7 +651,7 @@ h1 {
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 5px;
   justify-content: center;
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
@@ -662,7 +662,7 @@ h1 {
 }
 
 .sponsor-brand-card img {
-  height: 92px;
+  height: 82px;
   object-fit: contain;
   width: 100%;
 }
@@ -680,17 +680,19 @@ h1 {
 }
 
 .sponsor-contact-card {
-  align-content: start;
+  align-content: center;
   display: grid;
-  gap: 10px;
+  justify-items: center;
 }
 
 .sponsor-contact-card > span:last-child {
   align-content: center;
   display: grid;
   gap: 5px;
-  min-height: 105px;
+  justify-items: center;
+  min-height: 0;
   text-align: center;
+  width: 100%;
 }
 
 .sponsor-contact-card strong {
@@ -2839,11 +2841,11 @@ textarea {
   }
 
   .sponsor-tier-panel.premium .sponsor-single-card {
-    height: 145px;
+    height: 128px;
   }
 
   .sponsor-tier-panel.premium .sponsor-brand-card img {
-    height: 120px;
+    height: 108px;
   }
 
   .sponsor-premium-card {
