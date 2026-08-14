@@ -618,11 +618,16 @@ h1 {
 .sponsor-gold-row {
   display: grid;
   gap: 6px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .sponsor-gold-row .sponsor-single-card {
+  grid-column: span 2;
   min-height: 132px;
+}
+
+.sponsor-gold-row .sponsor-single-card:nth-last-child(2) {
+  grid-column: 2 / span 2;
 }
 
 .sponsor-single-card {
@@ -679,6 +684,14 @@ h1 {
   max-width: 155px;
 }
 
+.sponsor-brand-card.karim-family {
+  background: #050505;
+}
+
+.sponsor-brand-card.karim-family img {
+  height: 112px;
+}
+
 .sponsor-contact-card {
   align-content: center;
   display: grid;
@@ -721,9 +734,7 @@ h1 {
   }
 
   .sponsor-gold-row {
-    grid-template-columns: repeat(4, minmax(155px, 1fr));
-    overflow-x: auto;
-    padding-bottom: 6px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .sponsor-single-row {
@@ -2836,6 +2847,25 @@ textarea {
 }
 
 @media (max-width: 560px) {
+  .sponsor-contact-card em {
+    overflow-wrap: anywhere;
+  }
+
+  .sponsor-gold-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sponsor-gold-row .sponsor-single-card,
+  .sponsor-gold-row .sponsor-single-card:nth-last-child(2) {
+    grid-column: span 1;
+  }
+
+  .sponsor-gold-row .sponsor-single-card:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 3px);
+  }
+
   .sponsor-tier-layout {
     grid-template-columns: 1fr;
   }
