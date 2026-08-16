@@ -21,10 +21,12 @@ const AMATEUR_GROUP_MATCHES = [
 
 const AMATEUR_ALL_MATCHES = [
   ...AMATEUR_GROUP_MATCHES,
-  { id: 6, date: "Aug 16", time: "6:10pm - 7:50pm", venue: "FO", label: "Semi-final 1" },
-  { id: 7, date: "Aug 16", time: "8:00pm - 10:00pm", venue: "FO", label: "Semi-final 2" },
+  { id: 6, date: "Aug 16", time: "6:10pm - 7:50pm", venue: "FO", label: "Semi-final 1", home: "nandonik", away: "dhumketu" },
+  { id: 7, date: "Aug 16", time: "8:00pm - 10:00pm", venue: "FO", label: "Semi-final 2", home: "joddha", away: "sonar-bangla" },
   { id: 8, date: "Aug 22", time: "6:00pm - 10:00pm", venue: "FO", label: "Final" }
 ];
+
+const AMATEUR_PUBLIC_MATCHES = AMATEUR_ALL_MATCHES.filter((match) => match.home && match.away);
 
 const amateurPicks = {
   scores: {},
@@ -73,9 +75,9 @@ function amateurScore(record, matchId) {
 }
 
 function renderAmateurPublicScores() {
-  const root = document.querySelector("#amateurPublicMatchList");
-  if (!root) return;
-  root.innerHTML = AMATEUR_GROUP_MATCHES.map((match) => {
+  const renderMatchList = (root, matches) => {
+    if (!root) return;
+    root.innerHTML = matches.map((match) => {
     const result = amateurMatchResults[String(match.id)];
     const score = result && result.homeScore !== null && result.awayScore !== null
       ? { home: result.homeScore, away: result.awayScore }
@@ -106,7 +108,7 @@ function renderAmateurPublicScores() {
     return `
       <article class="match-card amateur-league-match-card">
         <div class="match-meta">
-          <strong>Game ${match.id} · ${escapeAttr(match.date)}</strong><br />
+          <strong>${escapeAttr(match.label || `Game ${match.id}`)} · ${escapeAttr(match.date)}</strong><br />
           ${escapeAttr(match.time)}<br />${escapeAttr(match.venue)}
           <span class="status-pill status-${escapeAttr(status)}">${escapeAttr(status)}</span>
         </div>
@@ -122,7 +124,11 @@ function renderAmateurPublicScores() {
         ${eventRows ? `<div class="match-events" id="amateur-events-${match.id}" hidden>${eventRows}</div>` : ""}
       </article>
     `;
-  }).join("");
+    }).join("");
+  };
+
+  renderMatchList(document.querySelector("#amateurPublicMatchList"), AMATEUR_GROUP_MATCHES);
+  renderMatchList(document.querySelector("#amateurPublicSemiFinalList"), AMATEUR_ALL_MATCHES.filter((match) => match.id === 6 || match.id === 7));
   renderAmateurGroupStats();
 }
 
@@ -843,7 +849,7 @@ function initAmateurChallenge() {
   amateurEls.adminRefresh.addEventListener("click", loadAmateurAdminPredictions);
   amateurEls.predictionSelect.addEventListener("change", renderAmateurAdminPrediction);
   amateurEls.deletePrediction.addEventListener("click", deleteAmateurPrediction);
-  document.querySelector("#amateurPublicMatchList")?.addEventListener("click", (event) => {
+  document.querySelectorAll("#amateurPublicMatchList, #amateurPublicSemiFinalList").forEach((matchList) => matchList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-amateur-match-toggle]");
     if (!button) return;
     const panel = document.querySelector(`#amateur-events-${button.dataset.amateurMatchToggle}`);
@@ -851,8 +857,8 @@ function initAmateurChallenge() {
     const open = button.getAttribute("aria-expanded") === "true";
     button.setAttribute("aria-expanded", String(!open));
     panel.hidden = open;
-  });
-  amateurEls.matchResultSelect.innerHTML = AMATEUR_GROUP_MATCHES.map((match) => `<option value="${match.id}">Game ${match.id}: ${escapeAttr(teamByAmateurId(match.home).name)} vs ${escapeAttr(teamByAmateurId(match.away).name)}</option>`).join("");
+  }));
+  amateurEls.matchResultSelect.innerHTML = AMATEUR_PUBLIC_MATCHES.map((match) => `<option value="${match.id}">${escapeAttr(match.label || `Game ${match.id}`)}: ${escapeAttr(teamByAmateurId(match.home).name)} vs ${escapeAttr(teamByAmateurId(match.away).name)}</option>`).join("");
   amateurEls.matchResultSelect.addEventListener("change", populateAmateurMatchResultForm);
   amateurEls.matchResultForm.elements.status.addEventListener("change", () => {
     if (amateurEls.matchResultForm.elements.status.value !== "upcoming") return;
@@ -875,6 +881,12 @@ function initAmateurChallenge() {
         };
     amateurMatchResults[matchId] = result;
     saveAmateurLocalMatchResults();
+    if (Number(matchId) >= 6) {
+      amateurResults.scores = amateurResults.scores || {};
+      amateurResults.scores[matchId] = status === "upcoming" ? {} : { home: result.homeScore, away: result.awayScore };
+      saveAmateurLocalResults();
+      renderAmateurResultInputs();
+    }
     renderAmateurPublicScores();
     try {
       const synced = await saveAmateurRemoteMatchResult(matchId, {
@@ -883,6 +895,7 @@ function initAmateurChallenge() {
         status: result.status,
         events: result.events
       });
+      if (Number(matchId) >= 6) await saveAmateurRemoteResults();
       els.adminMessage.textContent = synced ? "Amateur score and match details updated." : "Amateur match saved in this browser. Sign in to sync it live.";
     } catch {
       els.adminMessage.textContent = "Amateur match saved locally, but the live update failed.";

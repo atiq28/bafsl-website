@@ -837,6 +837,10 @@ h1 {
   grid-column: 1 / -1;
 }
 
+.amateur-schedule-card.is-semifinals {
+  grid-column: span 2;
+}
+
 .amateur-public-match-list {
   display: grid;
   gap: 10px;
@@ -2729,6 +2733,10 @@ textarea {
   .amateur-roster-grid,
   .team-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .amateur-schedule-card.is-semifinals {
+    grid-column: auto;
   }
 
   .amateur-hero {
