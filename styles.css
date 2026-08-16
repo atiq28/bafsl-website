@@ -837,8 +837,9 @@ h1 {
   grid-column: 1 / -1;
 }
 
-.amateur-schedule-card.is-semifinals {
-  grid-column: span 2;
+.amateur-schedule-card.is-semifinals,
+.amateur-schedule-card.is-final {
+  grid-column: 1 / -1;
 }
 
 .amateur-public-match-list {
@@ -2735,7 +2736,8 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .amateur-schedule-card.is-semifinals {
+  .amateur-schedule-card.is-semifinals,
+  .amateur-schedule-card.is-final {
     grid-column: auto;
   }
 
