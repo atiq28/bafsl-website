@@ -23,7 +23,7 @@ const AMATEUR_ALL_MATCHES = [
   ...AMATEUR_GROUP_MATCHES,
   { id: 6, date: "Aug 16", time: "6:10pm - 7:50pm", venue: "FO", label: "Semi-final 1", home: "nandonik", away: "dhumketu" },
   { id: 7, date: "Aug 16", time: "8:00pm - 10:00pm", venue: "FO", label: "Semi-final 2", home: "joddha", away: "sonar-bangla" },
-  { id: 8, date: "Aug 22", time: "6:00pm - 10:00pm", venue: "FO", label: "Final" }
+  { id: 8, date: "Aug 22", time: "6:00pm - 10:00pm", venue: "FO", label: "Final", home: "nandonik", away: "sonar-bangla" }
 ];
 
 const AMATEUR_PUBLIC_MATCHES = AMATEUR_ALL_MATCHES.filter((match) => match.home && match.away);
@@ -129,11 +129,17 @@ function renderAmateurPublicScores() {
 
   renderMatchList(document.querySelector("#amateurPublicMatchList"), AMATEUR_GROUP_MATCHES);
   renderMatchList(document.querySelector("#amateurPublicSemiFinalList"), AMATEUR_ALL_MATCHES.filter((match) => match.id === 6 || match.id === 7));
+  renderMatchList(document.querySelector("#amateurPublicFinalList"), AMATEUR_ALL_MATCHES.filter((match) => match.id === 8));
   renderAmateurGroupStats();
 }
 
 function completedAmateurGroupResults() {
   return AMATEUR_GROUP_MATCHES.map((match) => ({ match, result: amateurMatchResults[String(match.id)] }))
+    .filter(({ result }) => result && result.status !== "upcoming" && result.homeScore !== null && result.awayScore !== null);
+}
+
+function completedAmateurTournamentResults() {
+  return AMATEUR_PUBLIC_MATCHES.map((match) => ({ match, result: amateurMatchResults[String(match.id)] }))
     .filter(({ result }) => result && result.status !== "upcoming" && result.homeScore !== null && result.awayScore !== null);
 }
 
@@ -178,7 +184,7 @@ function amateurGroupStandings() {
 
 function amateurPlayerLeaderboard(field) {
   const players = new Map();
-  completedAmateurGroupResults().forEach(({ result }) => {
+  completedAmateurTournamentResults().forEach(({ result }) => {
     (result.events || []).forEach((item) => {
       const name = field === "goals" ? (item.type === "goal" ? item.player : "") : (item.type === "goal" ? item.assist : "");
       if (!name) return;
@@ -849,7 +855,7 @@ function initAmateurChallenge() {
   amateurEls.adminRefresh.addEventListener("click", loadAmateurAdminPredictions);
   amateurEls.predictionSelect.addEventListener("change", renderAmateurAdminPrediction);
   amateurEls.deletePrediction.addEventListener("click", deleteAmateurPrediction);
-  document.querySelectorAll("#amateurPublicMatchList, #amateurPublicSemiFinalList").forEach((matchList) => matchList.addEventListener("click", (event) => {
+  document.querySelectorAll("#amateurPublicMatchList, #amateurPublicSemiFinalList, #amateurPublicFinalList").forEach((matchList) => matchList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-amateur-match-toggle]");
     if (!button) return;
     const panel = document.querySelector(`#amateur-events-${button.dataset.amateurMatchToggle}`);
