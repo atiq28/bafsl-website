@@ -611,8 +611,11 @@ h1 {
 }
 
 .sponsor-tier-panel.premium .sponsor-brand-card img {
+  display: block;
   height: 112px;
+  margin-inline: auto;
   max-width: 390px;
+  object-position: center;
 }
 
 .sponsor-gold-row {
@@ -624,10 +627,6 @@ h1 {
 .sponsor-gold-row .sponsor-single-card {
   grid-column: span 2;
   min-height: 132px;
-}
-
-.sponsor-gold-row .sponsor-single-card:nth-last-child(2) {
-  grid-column: 2 / span 2;
 }
 
 .sponsor-single-card {
@@ -690,6 +689,14 @@ h1 {
 
 .sponsor-brand-card.karim-family img {
   height: 112px;
+}
+
+.sponsor-brand-card.bangla-bazar {
+  background: #001f13;
+}
+
+.sponsor-brand-card.bangla-bazar img {
+  height: auto;
 }
 
 .sponsor-contact-card {
@@ -2865,15 +2872,8 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .sponsor-gold-row .sponsor-single-card,
-  .sponsor-gold-row .sponsor-single-card:nth-last-child(2) {
+  .sponsor-gold-row .sponsor-single-card {
     grid-column: span 1;
-  }
-
-  .sponsor-gold-row .sponsor-single-card:last-child {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: calc(50% - 3px);
   }
 
   .sponsor-tier-layout {
