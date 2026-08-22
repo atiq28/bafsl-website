@@ -193,13 +193,22 @@ create table if not exists public.amateur_results (
 );
 
 create table if not exists public.amateur_match_results (
-  match_id integer primary key check (match_id between 1 and 5),
+  match_id integer primary key check (match_id between 1 and 8),
   home_score integer check (home_score >= 0),
   away_score integer check (away_score >= 0),
   status text not null default 'upcoming' check (status in ('upcoming', 'live', 'completed')),
   events jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
 );
+
+-- Earlier installations limited this table to the five group-stage games.
+-- Replace that constraint so semi-final and final results can also persist.
+alter table public.amateur_match_results
+drop constraint if exists amateur_match_results_match_id_check;
+
+alter table public.amateur_match_results
+add constraint amateur_match_results_match_id_check
+check (match_id between 1 and 8);
 
 alter table public.amateur_predictions enable row level security;
 alter table public.amateur_results enable row level security;

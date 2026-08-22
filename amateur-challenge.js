@@ -833,12 +833,15 @@ async function loadAmateurRemoteMatchResults() {
     const response = await fetch(`${REMOTE_CONFIG.supabaseUrl.replace(/\/$/, "")}/rest/v1/amateur_match_results?select=match_id,home_score,away_score,status,events`, { headers: remoteHeaders() });
     if (!response.ok) return;
     const rows = await response.json();
-    amateurMatchResults = Object.fromEntries(rows.map((row) => [String(row.match_id), {
+    const remoteMatchResults = Object.fromEntries(rows.map((row) => [String(row.match_id), {
       homeScore: row.home_score,
       awayScore: row.away_score,
       status: row.status,
       events: row.events || []
     }]));
+    // Keep locally saved knockout results when an older database installation
+    // only returns the five group-stage matches. Successful remote rows win.
+    amateurMatchResults = { ...amateurMatchResults, ...remoteMatchResults };
     saveAmateurLocalMatchResults();
     renderAmateurPublicScores();
     populateAmateurMatchResultForm();
