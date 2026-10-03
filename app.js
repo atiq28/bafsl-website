@@ -73,6 +73,29 @@ function addPioneerTeams(schedule) {
   return schedule;
 }
 
+const PREMIER_LEG2_ROSTERS = {
+  svfc: ["Ishraq", "Anupom", "Huda", "Shakil", "Tito", "Raihan", "Tonmoy", "Mridul", "Tanjeem", "Mizan", "Amit", "Abrar", "Kevin", "Samuel", "Rayyan", "Ornob", "Samin", "Mushfiq", "Shafkat"],
+  fcbb: ["Abdullah Hil Baky", "Afibuzzaman Anik", "Asif Haque", "Golam Jakaria Jony", "Hanzalah Kaif", "Md Nazibul Islam", "Md Sayedul Aman", "Moayad Fahim", "Monir Uz Zaman", "Mostofa Patwary", "Rahamin Hossain", "Saju Saha", "Shouman Das", "Sirat Samyoun", "Subir Sarker Mithu", "Tanzir Ahmed", "Taru", "Tanvir Ahmed Chowdhury", "Ayman Islam"],
+  stfc: ["Maruf Abir Bappy", "Zashim Uddin", "Mohammad Moshiur Rash", "Mahdi Zaman", "Sayem Muhammed Albhe", "Arka Biswas", "Md Shariful Islam", "Mir Tanveer Islam", "Raiyan Mainuddin", "Rumi Karim", "Sandipan Paul Arnab", "Sani Khan", "Shafeey Rahman", "Shafique Al Mamun", "Shah Roman", "Shaikh Nazrul Islam", "Mejbah Alam", "Sanjay Debnath", "Mahmud Reaz Ankur", "Wasif Tazwar Tasin"],
+  bufc: ["Mobasher Hasan", "Abu Bakar Siddik", "Zahidul Alam", "Tes Yemaneab", "Hassan Ratib", "Pablo Barua", "Md Opu", "Nurul Muttakin", "Abrar Jahin", "Shah Nawaz", "Azmir Bhuiyan", "Mir Ali", "Salman Sakib", "Obaidur Rashid", "Sagor Ahmed", "Al Jakaria Habib", "Masrur Hossain (Sumon)", "Anwar Hakim Tamim", "Rijwhe Sarker", "Fawad Sarwar"],
+  kbfc: ["Rivan Rashid", "Atiq Islam", "Habibur Rahman", "Syed Ahmed Al Muyeed", "S M Faisal", "Sumedh Guha", "Ahsan Arefin", "Tahmid Rashid Upal", "Nafees Rahman", "Sabiq Khan", "Jawad Bappy", "Fahim Karim", "Mohd Shahbaz", "Shaman Murshed", "Irshad Yasin", "Arman Elahi", "Manzurul Khan (Rony)", "Md Athikul Islam", "Faisal Shahid", "Zoheb Amin"]
+};
+
+function updatePremierLeg2Rosters(schedule) {
+  if (schedule.premierLeg2RostersUpdated) return schedule;
+  for (const team of schedule.teams) {
+    if (team.division !== "premier-2026-27-main") continue;
+    const key = [team.id, team.shortName, team.name]
+      .map((value) => String(value || "").trim().toLowerCase())
+      .find((value) => Object.hasOwn(PREMIER_LEG2_ROSTERS, value));
+    if (!key) continue;
+    team.roster = [...PREMIER_LEG2_ROSTERS[key]];
+    team.rosterPoster = "assets/premier-2026-27/leg-2-rosters.png";
+  }
+  schedule.premierLeg2RostersUpdated = true;
+  return schedule;
+}
+
 const defaultState = {
   selectedLeague: "premier",
   selectedSeason: "premier-2026-27",
@@ -206,12 +229,12 @@ const els = {
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return addPioneerTeams(addPremierLeg2(structuredClone(defaultState)));
+  if (!saved) return updatePremierLeg2Rosters(addPioneerTeams(addPremierLeg2(structuredClone(defaultState))));
 
   try {
-    return addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...JSON.parse(saved), adminLoggedIn: false }));
+    return updatePremierLeg2Rosters(addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...JSON.parse(saved), adminLoggedIn: false })));
   } catch {
-    return addPioneerTeams(addPremierLeg2(structuredClone(defaultState)));
+    return updatePremierLeg2Rosters(addPioneerTeams(addPremierLeg2(structuredClone(defaultState))));
   }
 }
 
@@ -256,7 +279,7 @@ async function loadRemoteState() {
     if (!response.ok) throw new Error("Remote data could not be loaded.");
     const rows = await response.json();
     if (rows[0]?.data) {
-      state = addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...rows[0].data, adminLoggedIn: false }));
+      state = updatePremierLeg2Rosters(addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...rows[0].data, adminLoggedIn: false })));
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, adminLoggedIn: false }));
       renderAll();
     }

@@ -34,6 +34,6 @@ test('migration preserves saved results and avoids duplicate fixtures', () => {
 });
 
 test('both local and cloud loading apply the schedule migration', () => {
-  assert.match(source, /return addPioneerTeams\(addPremierLeg2\(\{ .*JSON\.parse\(saved\)/);
-  assert.match(source, /state = addPioneerTeams\(addPremierLeg2\(\{ .*rows\[0\]\.data/);
+  assert.match(source, /return updatePremierLeg2Rosters\(addPioneerTeams\(addPremierLeg2\(\{ .*JSON\.parse\(saved\)/);
+  assert.match(source, /state = updatePremierLeg2Rosters\(addPioneerTeams\(addPremierLeg2\(\{ .*rows\[0\]\.data/);
 });
