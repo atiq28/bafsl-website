@@ -1,0 +1,30 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { randomUUID } = require('node:crypto');
+const source = fs.readFileSync(require('node:path').join(__dirname, '../app.js'), 'utf8');
+
+test('Pioneer teams populate the fixture dropdown without losing selected teams', () => {
+  const hint = {};
+  const state = { divisions: [{ id: 'pioneer' }, { id: 'premier' }], teams: [] };
+  const els = { fixtureDivision: { value: 'pioneer' }, fixtureHome: { value: '' }, fixtureAway: { value: '' }, fixtureSubmit: {} };
+  const context = vm.createContext({ state, els, crypto: { randomUUID }, slugify: s => s.toLowerCase(), escapeAttr: s => s, document: { querySelector: () => hint } });
+  vm.runInContext(source.slice(source.indexOf('function renderFixtureTeamOptions()'), source.indexOf('function populateFixtureForm()')), context);
+  context.renderFixtureTeamOptions();
+  assert.match(els.fixtureHome.innerHTML, /No teams added yet/);
+  assert.equal(els.fixtureSubmit.disabled, true);
+  const home = context.createLeagueTeam('Alpha', 'ALP', 'pioneer');
+  els.fixtureHome.value = home.id;
+  context.createLeagueTeam('Beta', 'BET', 'pioneer');
+  context.createLeagueTeam('Other', 'OTH', 'premier');
+  context.renderFixtureTeamOptions();
+  assert.match(els.fixtureHome.innerHTML, /Alpha/);
+  assert.match(els.fixtureAway.innerHTML, /Beta/);
+  assert.doesNotMatch(els.fixtureHome.innerHTML, /Other/);
+  assert.equal(els.fixtureHome.value, home.id);
+  assert.equal(els.fixtureSubmit.disabled, false);
+  assert.throws(() => context.createLeagueTeam(' alpha ', 'ALP', 'pioneer'), /already exists/);
+  assert.throws(() => context.createLeagueTeam(' ', 'A', 'pioneer'), /Enter a team name/);
+  assert.equal(state.teams.length, 3);
+});

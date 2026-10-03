@@ -3196,3 +3196,35 @@ textarea {
     flex-direction: column;
   }
 }
+
+/* Past tournament content stays accessible below the current league. */
+.amateur-archive {
+  margin-top: 24px;
+  border: 1px solid var(--line, #dce3eb);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.amateur-archive > summary {
+  padding: 20px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.amateur-archive > summary:focus-visible {
+  outline: 3px solid var(--accent, #246b46);
+  outline-offset: -3px;
+}
+.amateur-archive-content {
+  padding: 0 20px 20px;
+}
+
+#amateurPredictionForm .world-cup-entry[hidden] {
+  display: none;
+}
+
+.team-roster-poster {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
+  border-radius: 12px;
+}

@@ -12,6 +12,67 @@ const rosters = {
   bufc: ["Salman", "Mobasher", "Zahid", "Siddik", "Hassan", "Abrar", "Pablo", "Nayeer", "Tes", "Shafique", "Nurul", "Nawaz", "Azmir", "Mir Ali", "Sadman", "Jakaria", "Suvo", "Sagor", "Obaid", "Azizul"]
 };
 
+const PREMIER_LEG2_FIXTURES = [
+  [7, "2026-09-19", "2026-09-20", "fcbb", "svfc", "kbfc"],
+  [7, "2026-09-19", "2026-09-20", "stfc", "bufc", "svfc"],
+  [8, "2026-10-03", "2026-10-04", "svfc", "stfc", "bufc"],
+  [8, "2026-10-03", "2026-10-04", "kbfc", "fcbb", "stfc"],
+  [9, "2026-10-24", "2026-10-25", "svfc", "kbfc", "stfc"],
+  [9, "2026-10-24", "2026-10-25", "bufc", "fcbb", "kbfc"],
+  [10, "2026-11-07", "2026-11-08", "bufc", "svfc", "fcbb"],
+  [10, "2026-11-07", "2026-11-08", "stfc", "kbfc", "bufc"],
+  [11, "2027-01-30", "2027-01-31", "kbfc", "bufc", "svfc"],
+  [11, "2027-01-30", "2027-01-31", "fcbb", "stfc", "bufc"]
+].map(([week, date, dateEnd, home, away, referee]) => ({
+  id: `premier-2026-27-leg2-${home}-${away}`,
+  division: "premier-2026-27-main", leg: 2, week, date, dateEnd,
+  home, away, referee, time: "", venue: "", homeScore: null,
+  awayScore: null, status: "upcoming", events: []
+}));
+
+function addPremierLeg2(schedule) {
+  if (schedule.premierLeg2Added) return schedule;
+  for (const fixture of PREMIER_LEG2_FIXTURES) {
+    const existing = schedule.matches.find((match) => match.id === fixture.id || (
+      match.division === fixture.division && match.home === fixture.home &&
+      match.away === fixture.away && match.date >= "2026-09-01" && match.date < "2027-03-01"
+    ));
+    if (!existing) schedule.matches.push(structuredClone(fixture));
+  }
+  schedule.premierLeg2Added = true;
+  return schedule;
+}
+
+const PIONEER_2026_TEAMS = [
+  { name: "DFC", players: [[21, "Chayan"], [4, "Dipan"], [18, "Khurshid"], [6, "Mazhar"], [15, "Munwar"], [9, "Nobin"], [1, "Rafi"], [8, "Reza"], [11, "Saman"], [25, "Shariful"], [14, "Tomal"]] },
+  { name: "KKFC", players: [[1, "Farhan"], [2, "Hasan"], [3, "Opu"], [4, "Rifat"], [5, "Ripon"], [6, "Roohany"], [7, "Sabbir"], [8, "Sakeb"], [9, "Shovon"], [10, "Topu"], [11, "Turjo"]] },
+  { name: "NKFC", players: [[12, "Jaisan"], [14, "Masud"], [1, "Nazam"], [10, "Niamul"], [17, "Rizwan"], [2, "Ron"], [3, "Shahadat"], [19, "Shahriar"], [16, "Shams"], [21, "Tamim"]] }
+].map(({ name, players }) => ({
+  id: `${name.toLowerCase()}-pioneer-2026-27`, division: "pioneer-2026-27-main",
+  name, shortName: name, roster: players.map(([, player]) => player),
+  jerseyNumbers: Object.fromEntries(players.map(([number, player]) => [player, number])),
+  rosterPoster: `assets/pioneer-2026-27/${name.toLowerCase()}-roster.jpeg`
+}));
+
+function addPioneerTeams(schedule) {
+  if (schedule.pioneer2026TeamsAdded) return schedule;
+  for (const team of PIONEER_2026_TEAMS) {
+    const existing = schedule.teams.find((item) => item.division === team.division && (
+      item.id === team.id || item.name.trim().toUpperCase() === team.name || item.shortName?.trim().toUpperCase() === team.shortName
+    ));
+    if (existing) {
+      // Retain IDs used by saved fixtures and any additional roster members.
+      existing.roster = [...new Set([...team.roster, ...(existing.roster || [])])];
+      existing.jerseyNumbers = { ...existing.jerseyNumbers, ...team.jerseyNumbers };
+      existing.rosterPoster = team.rosterPoster;
+    } else {
+      schedule.teams.push(structuredClone(team));
+    }
+  }
+  schedule.pioneer2026TeamsAdded = true;
+  return schedule;
+}
+
 const defaultState = {
   selectedLeague: "premier",
   selectedSeason: "premier-2026-27",
@@ -145,12 +206,12 @@ const els = {
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return structuredClone(defaultState);
+  if (!saved) return addPioneerTeams(addPremierLeg2(structuredClone(defaultState)));
 
   try {
-    return { ...structuredClone(defaultState), ...JSON.parse(saved), adminLoggedIn: false };
+    return addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...JSON.parse(saved), adminLoggedIn: false }));
   } catch {
-    return structuredClone(defaultState);
+    return addPioneerTeams(addPremierLeg2(structuredClone(defaultState)));
   }
 }
 
@@ -195,7 +256,7 @@ async function loadRemoteState() {
     if (!response.ok) throw new Error("Remote data could not be loaded.");
     const rows = await response.json();
     if (rows[0]?.data) {
-      state = { ...structuredClone(defaultState), ...rows[0].data, adminLoggedIn: false };
+      state = addPioneerTeams(addPremierLeg2({ ...structuredClone(defaultState), ...rows[0].data, adminLoggedIn: false }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, adminLoggedIn: false }));
       renderAll();
     }
@@ -320,6 +381,10 @@ function currentMatches() {
 }
 
 function formatDate(match) {
+  if (match.dateEnd) {
+    const formatter = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return formatter.formatRange(new Date(`${match.date}T12:00`), new Date(`${match.dateEnd}T12:00`));
+  }
   const date = new Date(`${match.date}T${match.time || "12:00"}`);
   return new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" }).format(date);
 }
@@ -682,7 +747,9 @@ function renderMatches() {
         <button class="match-share-button" type="button" data-share-match="${match.id}" aria-label="Copy ${escapeAttr(matchShareText(match))} link" title="Copy match link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.1c-.8 0-1.5.3-2 .8L8.9 12.7c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 3 2.9s3-1.3 3-3-1.3-2.8-3-2.8Z" /></svg></button>
         <div class="match-meta">
           <strong>${formatDate(match)}</strong><br />
-          ${match.time ? `${formatTime(match)}<br />` : ""}
+          ${match.leg ? `Leg ${match.leg} · Week ${match.week}<br />` : ""}
+          ${match.time ? `${formatTime(match)}<br />` : match.leg === 2 ? "Time TBA<br />" : ""}
+          ${match.referee ? `Ref: ${escapeAttr(teamById(match.referee).name)}<br />` : ""}
           ${match.venue || "Venue TBA"}
           <span class="status-pill status-${match.status}">${match.status}</span>
         </div>
@@ -699,6 +766,9 @@ function renderMatches() {
       </article>
     `;
   }).join("");
+  if (state.selectedDivision === "premier-2026-27-main" && ["all", "upcoming"].includes(state.selectedFilter)) {
+    els.matchList.insertAdjacentHTML("beforeend", `<article class="panel"><span class="mini-label">Leg 2 · Week 12</span><h3>Reserve weekend</h3><p>February 6–7, 2027 · Reserved for rescheduled matches.</p></article>`);
+  }
 }
 
 function renderTeams() {
@@ -884,10 +954,12 @@ function renderBlog() {
 
 function renderAdminOptions() {
   const divisionOptions = state.divisions.map((division) => `<option value="${division.id}">${leagueById(division.league).name} &middot; ${seasonById(division.season).name}</option>`).join("");
+  const fixtureDivision = els.fixtureDivision.value || state.selectedDivision;
+  const teamDivision = els.teamDivision.value || state.selectedDivision;
   els.fixtureDivision.innerHTML = divisionOptions;
   els.teamDivision.innerHTML = divisionOptions;
-  els.fixtureDivision.value = state.selectedDivision;
-  els.teamDivision.value = state.selectedDivision;
+  els.fixtureDivision.value = fixtureDivision;
+  els.teamDivision.value = teamDivision;
 
   els.scoreMatchSelect.innerHTML = state.matches.map((match) => `
     <option value="${match.id}">${divisionById(match.division).name}: ${teamById(match.home).name} vs ${teamById(match.away).name} (${formatDate(match)})</option>
@@ -917,12 +989,30 @@ function renderAdminOptions() {
 
 function renderFixtureTeamOptions() {
   const division = els.fixtureDivision.value;
-  const options = state.teams
-    .filter((team) => team.division === division)
-    .map((team) => `<option value="${team.id}">${team.name}</option>`)
-    .join("");
-  els.fixtureHome.innerHTML = options;
-  els.fixtureAway.innerHTML = options;
+  const teams = state.teams.filter((team) => team.division === division);
+  const options = teams.map((team) => `<option value="${escapeAttr(team.id)}">${escapeAttr(team.name)}</option>`).join("");
+  for (const select of [els.fixtureHome, els.fixtureAway]) {
+    const selected = select.value;
+    select.innerHTML = `<option value="">${teams.length ? "Select a team" : "No teams added yet"}</option>${options}`;
+    if (teams.some((team) => team.id === selected)) select.value = selected;
+  }
+  els.fixtureSubmit.disabled = teams.length < 2;
+  document.querySelector("#fixtureTeamHint").textContent = teams.length < 2
+    ? "Add at least two teams for this league and season using the form below."
+    : "Select the home and away teams, or add another team below.";
+}
+
+function createLeagueTeam(name, shortName, division) {
+  name = name.trim();
+  shortName = shortName.trim().toUpperCase();
+  if (!name || !shortName) throw new Error("Enter a team name and short name.");
+  if (!state.divisions.some((item) => item.id === division)) throw new Error("Select a league and season.");
+  if (state.teams.some((team) => team.division === division && team.name.toLowerCase() === name.toLowerCase())) {
+    throw new Error("This team already exists in the selected league and season.");
+  }
+  const team = { id: `${slugify(name)}-${crypto.randomUUID()}`, division, name, shortName, roster: [] };
+  state.teams.push(team);
+  return team;
 }
 
 function populateFixtureForm() {
@@ -931,7 +1021,6 @@ function populateFixtureForm() {
   els.deleteFixtureButton.disabled = !match;
 
   if (!match) {
-    els.fixtureDivision.value = state.selectedDivision;
     renderFixtureTeamOptions();
     els.fixtureForm.elements.date.value = "";
     els.fixtureForm.elements.time.value = "";
@@ -1037,8 +1126,9 @@ function renderTeamPage(teamId) {
       <section class="panel">
         <div class="section-heading"><span>Players</span><h2>Current Roster</h2></div>
         <div class="roster-grid">
-          ${(team.roster || []).map((player) => `<span>${player}</span>`).join("") || `<p class="rank-meta">Roster coming soon.</p>`}
+          ${(team.roster || []).map((player) => `<span>${team.jerseyNumbers?.[player] != null ? `<strong>#${escapeAttr(String(team.jerseyNumbers[player]))}</strong> · ` : ""}${escapeAttr(player)}</span>`).join("") || `<p class="rank-meta">Roster coming soon.</p>`}
         </div>
+        ${team.rosterPoster ? `<a href="${escapeAttr(team.rosterPoster)}" target="_blank" rel="noopener"><img class="team-roster-poster" src="${escapeAttr(team.rosterPoster)}" alt="${escapeAttr(team.name)} supplied roster poster" loading="lazy" /></a>` : ""}
       </section>
     </div>
   `;
@@ -1357,9 +1447,10 @@ els.fixtureSelect.addEventListener("change", populateFixtureForm);
 els.fixtureDivision.addEventListener("change", renderFixtureTeamOptions);
 
 els.newFixtureButton.addEventListener("click", () => {
+  const division = els.fixtureDivision.value;
   els.fixtureForm.reset();
   els.fixtureSelect.value = "new";
-  els.fixtureDivision.value = state.selectedDivision;
+  els.fixtureDivision.value = division;
   renderFixtureTeamOptions();
   els.fixtureSubmit.textContent = "Add Fixture";
   els.deleteFixtureButton.disabled = true;
@@ -1387,6 +1478,11 @@ els.fixtureForm.addEventListener("submit", (event) => {
   const away = String(form.get("away"));
   const fixtureId = String(form.get("fixtureId"));
 
+  if (![home, away].every((id) => state.teams.some((team) => team.id === id && team.division === String(form.get("division"))))) {
+    els.adminMessage.textContent = "Select two teams from this league and season.";
+    return;
+  }
+
   if (home === away) {
     els.adminMessage.textContent = "Choose two different teams.";
     return;
@@ -1403,6 +1499,7 @@ els.fixtureForm.addEventListener("submit", (event) => {
   };
 
   if (existingMatch) {
+    if (existingMatch.date !== fixtureData.date || fixtureData.time) delete existingMatch.dateEnd;
     Object.assign(existingMatch, fixtureData);
     els.adminMessage.textContent = "Fixture updated.";
   } else {
@@ -1421,25 +1518,40 @@ els.fixtureForm.addEventListener("submit", (event) => {
   renderAll();
 });
 
+document.querySelector("#fixtureAddTeam").addEventListener("click", () => {
+  const name = document.querySelector("#fixtureTeamName");
+  const shortName = document.querySelector("#fixtureTeamShortName");
+  const message = document.querySelector("#fixtureTeamMessage");
+  try {
+    const team = createLeagueTeam(name.value, shortName.value, els.fixtureDivision.value);
+    saveState({ sync: true });
+    renderFixtureTeamOptions();
+    if (!els.fixtureHome.value) els.fixtureHome.value = team.id;
+    else if (!els.fixtureAway.value) els.fixtureAway.value = team.id;
+    renderTeams();
+    renderStandings();
+    name.value = "";
+    shortName.value = "";
+    message.textContent = `${team.name} added. You can select it for this fixture.`;
+  } catch (error) {
+    message.textContent = error.message;
+  }
+});
+
 els.teamForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
-  const name = String(form.get("name")).trim();
   const division = String(form.get("division"));
-  const id = `${slugify(name)}-${Date.now().toString().slice(-4)}`;
-
-  state.teams.push({
-    id,
-    division,
-    name,
-    shortName: String(form.get("shortName")).trim().toUpperCase(),
-    roster: []
-  });
-
-  saveState({ sync: true });
-  renderAll();
-  event.currentTarget.reset();
-  els.adminMessage.textContent = "Team added.";
+  try {
+    createLeagueTeam(String(form.get("name")), String(form.get("shortName")), division);
+    saveState({ sync: true });
+    event.currentTarget.reset();
+    els.teamDivision.value = division;
+    renderAll();
+    els.adminMessage.textContent = "Team added.";
+  } catch (error) {
+    els.adminMessage.textContent = error.message;
+  }
 });
 
 els.blogSelect.addEventListener("change", populateBlogForm);

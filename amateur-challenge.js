@@ -223,9 +223,10 @@ function renderAmateurGroupStats() {
 }
 
 function setAmateurChallengeOpen(open, options = {}) {
+  if (open) document.querySelector("#amateurArchive").open = true;
   amateurEls.details.classList.toggle("is-hidden", !open);
   amateurEls.toggle.setAttribute("aria-expanded", String(open));
-  amateurEls.toggle.textContent = open ? "Close Challenge" : "Open Challenge";
+  amateurEls.toggle.textContent = open ? "Close Challenge Archive" : "View Challenge Archive";
   if (open && options.scroll) amateurEls.challenge.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -238,15 +239,15 @@ async function shareAmateurChallenge() {
   try {
     if (navigator.share) {
       await navigator.share({
-        title: "BAFSL Amateur Soccer Tournament 2026 Prediction Challenge",
-        text: "Make your picks for the 8th Amateur Soccer Tournament 2026.",
+        title: "BAFSL Amateur Soccer Tournament 2026 Archive",
+        text: "View the archived 8th Amateur Soccer Tournament 2026.",
         url
       });
       return;
     }
     if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
     else fallbackCopyText(url);
-    showShareToast("Challenge link copied");
+    showShareToast("Archive link copied");
   } catch (error) {
     if (error?.name !== "AbortError") window.prompt("Copy this challenge link", url);
   }
@@ -1029,6 +1030,7 @@ function initAmateurChallenge() {
   document.addEventListener("bafsl-admin-login", loadAmateurAdminPredictions);
 
   renderAmateurBracket();
+  amateurEls.bracket.querySelectorAll("input, select, button").forEach((control) => { control.disabled = true; });
   renderAmateurPublicScores();
   populateAmateurMatchResultForm();
   renderAmateurRules();
@@ -1036,6 +1038,16 @@ function initAmateurChallenge() {
   loadAmateurRemoteResults();
   loadAmateurRemoteMatchResults();
   loadAmateurLeaderboard();
+  const revealAmateurArchiveTarget = () => {
+    const target = document.getElementById(window.location.hash.slice(1));
+    const archive = document.querySelector("#amateurArchive");
+    if (target && archive.contains(target)) {
+      archive.open = true;
+      target.scrollIntoView();
+    }
+  };
+  window.addEventListener("hashchange", revealAmateurArchiveTarget);
+  revealAmateurArchiveTarget();
   if (new URLSearchParams(window.location.search).get("challenge") === "amateur-2026") {
     setAmateurChallengeOpen(true, { scroll: true });
   }

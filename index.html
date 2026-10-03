@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BAFSL | Bay Area Friendly Soccer League</title>
-    <meta name="description" content="Follow BAFSL with current fixtures, match results, points tables, top scorers, assists, team rosters, Bay Area league stories, and the 8th Amateur Soccer Tournament 2026." />
+    <meta name="description" content="Follow BAFSL with current fixtures, match results, points tables, top scorers, assists, team rosters, Bay Area league stories, and tournament archives." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="BAFSL" />
     <meta property="og:title" content="BAFSL - Bay Area Friendly Soccer League" />
-    <meta property="og:description" content="The home for BAFSL fixtures, scores, tables, scorers, assists, team rosters, league stories, and the 8th Amateur Soccer Tournament 2026." />
+    <meta property="og:description" content="The home for BAFSL fixtures, scores, tables, scorers, assists, team rosters, league stories, and tournament archives." />
     <meta property="og:url" content="https://bafsl.com/" />
     <meta property="og:image" content="https://bafsl.com/assets/bafsl-hero.png" />
     <meta property="og:image:secure_url" content="https://bafsl.com/assets/bafsl-hero.png" />
@@ -18,7 +18,7 @@
     <meta property="og:image:alt" content="Bay Area Friendly Soccer League match action" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="BAFSL - Bay Area Friendly Soccer League" />
-    <meta name="twitter:description" content="Fixtures, scores, tables, scorers, assists, team rosters, league stories, and the 8th Amateur Soccer Tournament 2026." />
+    <meta name="twitter:description" content="Fixtures, scores, tables, scorers, assists, team rosters, league stories, and tournament archives." />
     <meta name="twitter:image" content="https://bafsl.com/assets/bafsl-hero.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
@@ -35,7 +35,6 @@
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="#fixtures">Fixtures</a>
-        <a href="#amateur-2026">Amateur 2026</a>
         <a href="#world-cup">World Cup 2026</a>
         <a href="#teams">Teams</a>
         <a href="#table">Table</a>
@@ -79,12 +78,148 @@
         </div>
       </section>
 
-      <section class="content-shell amateur-section" id="amateur-2026">
+      <section class="content-shell team-page is-hidden" id="teamPage"></section>
+
+      <section class="content-shell live-layout" id="fixtures">
+        <aside class="sidebar">
+          <div class="section-heading compact">
+            <span>Leagues & Seasons</span>
+            <h2>League Center</h2>
+          </div>
+          <div class="league-list" id="leagueTabs" role="tablist" aria-label="Leagues and seasons"></div>
+          <div class="season-list is-hidden" id="seasonTabs" role="tablist" aria-label="Seasons"></div>
+          <div class="division-list is-hidden" id="divisionTabs" role="tablist" aria-label="Divisions"></div>
+        </aside>
+
+        <section class="match-panel">
+          <div class="section-heading">
+            <span id="selectedDivisionLabel">Division</span>
+            <h2>Fixtures & Results</h2>
+          </div>
+          <div class="match-filters" id="matchFilters" aria-label="Match filters">
+            <button class="filter-button is-active" type="button" data-filter="all">All</button>
+            <button class="filter-button" type="button" data-filter="upcoming">Upcoming</button>
+            <button class="filter-button" type="button" data-filter="live">Live</button>
+            <button class="filter-button" type="button" data-filter="completed">Results</button>
+          </div>
+          <div class="match-list" id="matchList"></div>
+        </section>
+      </section>
+
+      <section class="content-shell" id="teams">
+        <div class="section-heading">
+          <span>Clubs</span>
+          <h2>Meet The Teams</h2>
+        </div>
+        <div class="team-grid" id="teamGrid"></div>
+      </section>
+
+      <section class="content-shell table-layout" id="table">
+        <div class="section-heading">
+          <span>Standings</span>
+          <h2>Points Table</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Club</th>
+                <th>P</th>
+                <th>W</th>
+                <th>D</th>
+                <th>L</th>
+                <th>GF</th>
+                <th>GA</th>
+                <th>GD</th>
+                <th>Pts</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-shell stats-grid">
+        <section id="scorers" class="panel">
+          <div class="section-heading">
+            <span>Golden Boot</span>
+            <h2>Top Scorers</h2>
+          </div>
+          <div class="rank-list" id="scorerList"></div>
+        </section>
+
+        <section id="stats" class="panel">
+          <div class="section-heading">
+            <span>Playmakers</span>
+            <h2>Top Assists</h2>
+          </div>
+          <div class="rank-list" id="assistList"></div>
+        </section>
+      </section>
+
+      <section class="content-shell stats-grid">
+        <section class="panel">
+          <div class="section-heading">
+            <span>Numbers</span>
+            <h2>Season Stats</h2>
+          </div>
+          <div class="stat-cards" id="leagueStats"></div>
+        </section>
+      </section>
+
+      <section class="content-shell" id="blog">
+        <div class="section-heading">
+          <span>Blog</span>
+          <h2>হাওয়া থেকে পাওয়া</h2>
+        </div>
+        <div class="blog-grid" id="blogGrid"></div>
+      </section>
+
+      <section class="content-shell" id="news">
+        <div class="section-heading">
+          <span>Stories</span>
+          <h2>News & Updates</h2>
+        </div>
+        <div class="news-grid" id="newsGrid"></div>
+      </section>
+
+      <section class="content-shell amateur-section" id="amateur-2026" aria-labelledby="amateurArchiveTitle">
+        <div class="section-heading">
+          <span>Tournament archive · 2026</span>
+          <h2 id="amateurArchiveTitle">8th Amateur Soccer Tournament</h2>
+        </div>
+        <div class="amateur-group-stats">
+          <section class="amateur-standings-card">
+            <div class="section-heading compact">
+              <span>Group stage</span>
+              <h2>Points Table</h2>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+                <tbody id="amateurStandingsBody"></tbody>
+              </table>
+            </div>
+            <p class="rank-meta">Order: points, goal difference, goals scored, head-to-head, goals conceded, then fair play.</p>
+          </section>
+          <section class="leaderboard-card">
+            <div class="section-heading compact"><span>Player leaders</span><h2>Top Scorers</h2></div>
+            <div id="amateurScorerList"></div>
+          </section>
+          <section class="leaderboard-card">
+            <div class="section-heading compact"><span>Player leaders</span><h2>Top Assists</h2></div>
+            <div id="amateurAssistList"></div>
+          </section>
+        </div>
+
+        <details class="amateur-archive" id="amateurArchive">
+          <summary>View tournament archive — results, rosters, sponsors &amp; bracket challenge</summary>
+          <div class="amateur-archive-content">
         <div class="amateur-hero">
           <div>
             <span class="mini-label">8th Amateur Soccer Tournament</span>
             <h2>Tournament 2026</h2>
-            <p>Five teams, five tournament days, and one champion. Follow the full schedule, roster, ranking rules, and matchday guide for the 8th Amateur Soccer Tournament 2026.</p>
+            <p>Archived schedules, rosters, sponsors, rules, and match results from the 8th Amateur Soccer Tournament 2026.</p>
             <div class="amateur-actions">
               <a class="primary-action" href="#amateur-schedule">View Schedule</a>
               <a class="secondary-action" href="#amateur-rosters">Team Rosters</a>
@@ -195,30 +330,6 @@
           </article>
         </div>
 
-        <div class="amateur-group-stats">
-          <section class="amateur-standings-card">
-            <div class="section-heading compact">
-              <span>Group stage</span>
-              <h2>Points Table</h2>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
-                <tbody id="amateurStandingsBody"></tbody>
-              </table>
-            </div>
-            <p class="rank-meta">Order: points, goal difference, goals scored, head-to-head, goals conceded, then fair play.</p>
-          </section>
-          <section class="leaderboard-card">
-            <div class="section-heading compact"><span>Player leaders</span><h2>Top Scorers</h2></div>
-            <div id="amateurScorerList"></div>
-          </section>
-          <section class="leaderboard-card">
-            <div class="section-heading compact"><span>Player leaders</span><h2>Top Assists</h2></div>
-            <div id="amateurAssistList"></div>
-          </section>
-        </div>
-
         <div class="amateur-guide-grid">
           <article class="amateur-guide-card">
             <h3>Team Ranking</h3>
@@ -303,25 +414,25 @@
             <div>
               <span class="mini-label">Prediction Challenge</span>
               <h2>Amateur 2026 Bracket Challenge</h2>
-              <p>Predict every match score, the final group ranking, semi-final winners, final score, champion, and bonus awards.</p>
+              <p>Entries are closed. Browse the archived prediction leaderboard and scoring rules.</p>
             </div>
             <div class="world-cup-teaser-actions">
-              <button class="primary-action" id="amateurChallengeToggle" type="button" aria-expanded="false" aria-controls="amateurChallengeDetails">Open Challenge</button>
-              <button class="secondary-action" id="amateurChallengeShare" type="button">Share Challenge</button>
+              <button class="primary-action" id="amateurChallengeToggle" type="button" aria-expanded="false" aria-controls="amateurChallengeDetails">View Challenge Archive</button>
+              <button class="secondary-action" id="amateurChallengeShare" type="button">Share Archive</button>
             </div>
           </div>
 
           <div class="world-cup-challenge-details is-hidden" id="amateurChallengeDetails">
             <div class="world-cup-tabs" role="tablist" aria-label="Amateur tournament challenge">
-              <button class="world-cup-tab is-active" type="button" data-amateur-view="picks">Make Picks</button>
-              <button class="world-cup-tab" type="button" data-amateur-view="leaderboard">Leaderboard</button>
+              <button class="world-cup-tab" type="button" data-amateur-view="picks">Archived Bracket</button>
+              <button class="world-cup-tab is-active" type="button" data-amateur-view="leaderboard">Leaderboard</button>
               <button class="world-cup-tab" type="button" data-amateur-view="rules">Scoring</button>
             </div>
 
-            <section class="world-cup-view" data-amateur-panel="picks">
+            <section class="world-cup-view is-hidden" data-amateur-panel="picks">
               <form id="amateurPredictionForm">
                 <div id="amateurBracket"></div>
-                <div class="world-cup-entry">
+                <div class="world-cup-entry" hidden>
                   <div class="form-row">
                     <label>
                       Your Name
@@ -343,10 +454,10 @@
               </form>
             </section>
 
-            <section class="world-cup-view is-hidden" data-amateur-panel="leaderboard">
+            <section class="world-cup-view" data-amateur-panel="leaderboard">
               <div class="world-cup-leaderboard-head">
                 <div>
-                  <span class="mini-label">Live standings</span>
+                  <span class="mini-label">Archived standings</span>
                   <h3>Prediction Leaderboard</h3>
                 </div>
                 <button class="secondary-form-action world-cup-refresh" id="amateurRefresh" type="button">Refresh</button>
@@ -359,111 +470,8 @@
             </section>
           </div>
         </div>
-      </section>
-
-      <section class="content-shell team-page is-hidden" id="teamPage"></section>
-
-      <section class="content-shell live-layout" id="fixtures">
-        <aside class="sidebar">
-          <div class="section-heading compact">
-            <span>Leagues & Seasons</span>
-            <h2>League Center</h2>
           </div>
-          <div class="league-list" id="leagueTabs" role="tablist" aria-label="Leagues and seasons"></div>
-          <div class="season-list is-hidden" id="seasonTabs" role="tablist" aria-label="Seasons"></div>
-          <div class="division-list is-hidden" id="divisionTabs" role="tablist" aria-label="Divisions"></div>
-        </aside>
-
-        <section class="match-panel">
-          <div class="section-heading">
-            <span id="selectedDivisionLabel">Division</span>
-            <h2>Fixtures & Results</h2>
-          </div>
-          <div class="match-filters" id="matchFilters" aria-label="Match filters">
-            <button class="filter-button is-active" type="button" data-filter="all">All</button>
-            <button class="filter-button" type="button" data-filter="upcoming">Upcoming</button>
-            <button class="filter-button" type="button" data-filter="live">Live</button>
-            <button class="filter-button" type="button" data-filter="completed">Results</button>
-          </div>
-          <div class="match-list" id="matchList"></div>
-        </section>
-      </section>
-
-      <section class="content-shell" id="teams">
-        <div class="section-heading">
-          <span>Clubs</span>
-          <h2>Meet The Teams</h2>
-        </div>
-        <div class="team-grid" id="teamGrid"></div>
-      </section>
-
-      <section class="content-shell table-layout" id="table">
-        <div class="section-heading">
-          <span>Standings</span>
-          <h2>Points Table</h2>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Club</th>
-                <th>P</th>
-                <th>W</th>
-                <th>D</th>
-                <th>L</th>
-                <th>GF</th>
-                <th>GA</th>
-                <th>GD</th>
-                <th>Pts</th>
-              </tr>
-            </thead>
-            <tbody id="standingsBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="content-shell stats-grid">
-        <section id="scorers" class="panel">
-          <div class="section-heading">
-            <span>Golden Boot</span>
-            <h2>Top Scorers</h2>
-          </div>
-          <div class="rank-list" id="scorerList"></div>
-        </section>
-
-        <section id="stats" class="panel">
-          <div class="section-heading">
-            <span>Playmakers</span>
-            <h2>Top Assists</h2>
-          </div>
-          <div class="rank-list" id="assistList"></div>
-        </section>
-      </section>
-
-      <section class="content-shell stats-grid">
-        <section class="panel">
-          <div class="section-heading">
-            <span>Numbers</span>
-            <h2>Season Stats</h2>
-          </div>
-          <div class="stat-cards" id="leagueStats"></div>
-        </section>
-      </section>
-
-      <section class="content-shell" id="blog">
-        <div class="section-heading">
-          <span>Blog</span>
-          <h2>হাওয়া থেকে পাওয়া</h2>
-        </div>
-        <div class="blog-grid" id="blogGrid"></div>
-      </section>
-
-      <section class="content-shell" id="news">
-        <div class="section-heading">
-          <span>Stories</span>
-          <h2>News & Updates</h2>
-        </div>
-        <div class="news-grid" id="newsGrid"></div>
+        </details>
       </section>
 
       <section class="content-shell world-cup-section" id="world-cup">
@@ -641,13 +649,23 @@
             <div class="form-row">
               <label>
                 Home Team
-                <select name="home" id="fixtureHome"></select>
+                <select name="home" id="fixtureHome" required></select>
               </label>
               <label>
                 Away Team
-                <select name="away" id="fixtureAway"></select>
+                <select name="away" id="fixtureAway" required></select>
               </label>
             </div>
+            <p class="admin-hint" id="fixtureTeamHint" role="status"></p>
+            <details>
+              <summary>Add a team to this league and season</summary>
+              <div class="form-row">
+                <label>Team Name<input id="fixtureTeamName" /></label>
+                <label>Short Name<input id="fixtureTeamShortName" maxlength="5" /></label>
+              </div>
+              <button class="secondary-form-action" id="fixtureAddTeam" type="button">Add Team</button>
+              <p class="admin-hint" id="fixtureTeamMessage" role="status"></p>
+            </details>
             <div class="form-row">
               <button class="secondary-form-action" id="newFixtureButton" type="button">New Fixture</button>
               <button class="danger-action" id="deleteFixtureButton" type="button">Remove Fixture</button>
